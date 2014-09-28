@@ -1,0 +1,7 @@
+<RCC>
+  <qresource prefix="GraphIt">
+    <file>Resources/icon_quit.png</file>
+	<file>Resources/vivagraph.min.js</file>
+	<file>Resources/vivagraph.custom.js</file>
+  </qresource>
+</RCC>
