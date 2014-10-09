@@ -2,7 +2,7 @@
 
 # Form implementation generated from reading ui file 'GraphItApp.ui'
 #
-# Created: Sun Sep 28 19:33:22 2014
+# Created: Thu Oct  9 18:25:04 2014
 #      by: PyQt5 UI code generator 5.3.1
 #
 # WARNING! All changes made in this file will be lost!
@@ -41,6 +41,9 @@ class Ui_MainWindowUi(object):
         self.gridLayout_3 = QtWidgets.QGridLayout(self.dockWidgetContents_2)
         self.gridLayout_3.setObjectName("gridLayout_3")
         self.textEditLog = QtWidgets.QTextEdit(self.dockWidgetContents_2)
+        font = QtGui.QFont()
+        font.setFamily("Courier New")
+        self.textEditLog.setFont(font)
         self.textEditLog.setReadOnly(True)
         self.textEditLog.setObjectName("textEditLog")
         self.gridLayout_3.addWidget(self.textEditLog, 0, 0, 1, 1)
