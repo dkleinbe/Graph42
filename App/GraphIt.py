@@ -26,6 +26,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindowUi()
         self.ui.setupUi(self)
 
+        file = QFile()
 
         # create connections
 #        self.ui.exitAction.triggered.connect(QApplication.instance().quit)
