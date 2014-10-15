@@ -3,8 +3,11 @@ __author__ = 'T0005632'
 import unittest
 import logging
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
-from PyQt5.QtCore import QFile
+try:
+    from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
+    from PyQt5.QtCore import QFile
+except ImportError:
+    from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
 
 from ui_GraphItApp import Ui_MainWindowUi
 
