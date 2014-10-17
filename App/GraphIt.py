@@ -6,17 +6,13 @@ import sys
 
 try:
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
-    from PyQt5.QtCore import QFile
+    from PyQt5.QtCore import QFile, QObject, pyqtSignal
 except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
+
 from tools.logstream import StreamRedirector
 from tools.htmlcolorlog import HtmlColoredFormatter
 
-from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
-
-from PyQt5.QtCore import (QFile, \
-                          QObject,\
-                          pyqtSignal)
 
 from ui_GraphItApp import Ui_MainWindowUi
 
@@ -30,7 +26,6 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindowUi()
         self.ui.setupUi(self)
 
-        file = QFile()
 
         # create connections
 #        self.ui.exitAction.triggered.connect(QApplication.instance().quit)

@@ -1,8 +1,11 @@
 __author__ = 'T0005632'
 
-
-from PyQt5.QtCore import (QObject,\
-                          pyqtSignal)
+try:
+    from PyQt5.QtCore import (QObject,\
+                              pyqtSignal)
+except ImportError:
+    from PyQt4.QtCore import (QObject,\
+                             pyqtSignal)
 
 class StreamRedirector(QObject):
 
