@@ -3,6 +3,7 @@ __author__ = 'T0005632'
 import unittest
 import logging
 import sys
+import html
 
 try:
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
@@ -13,6 +14,7 @@ except ImportError:
 from tools.logstream import StreamRedirector
 from tools.htmlcolorlog import HtmlColoredFormatter
 
+from py2neo import neo4j
 
 from ui_GraphItApp import Ui_MainWindowUi
 
@@ -64,6 +66,17 @@ class MainWindow(QMainWindow):
         logger.error('Error message')
         logger.critical('Critical message')
 
+        self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
+
+
+    def Neo4jConnect(self):
+
+        try:
+            db = "http://localhost:7474/db/data/"
+            graph_db = neo4j.GraphDatabaseService(db)
+            logger.info('neo4j version: %s', graph_db.neo4j_version)
+        except:
+            logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1])
 
 if __name__ == '__main__':
 
@@ -76,5 +89,6 @@ if __name__ == '__main__':
 
     window = MainWindow()
     window.show()
+    window.raise_()
 
     sys.exit(app.exec_())
