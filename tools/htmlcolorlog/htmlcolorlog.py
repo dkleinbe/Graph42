@@ -4,7 +4,7 @@ from __future__ import absolute_import
 
 import logging
 import sys
-
+import html
 
 from tools.htmlcolorlog.escape_codes import escape_codes
 
@@ -52,8 +52,11 @@ class HtmlColoredFormatter(logging.Formatter):
         self.reset = reset
 
     def format(self, record):
-        # Add the color codes to the record
 
+        # Escape html code in message
+        record.msg = html.escape(record.msg)
+
+        # Add the color codes to the record
         record.__dict__.update(escape_codes)
 
         # If we recognise the level name,
@@ -72,9 +75,8 @@ class HtmlColoredFormatter(logging.Formatter):
 
         # Add a reset code to the end of the message
         # (if it wasn't explicitly added in format str)
-        if self.reset and not message.endswith(escape_codes['reset']):
-            message += escape_codes['reset']
-
+        if self.reset and not message.endswith(escape_codes['br']):
+            pass
             #message += escape_codes['br']
 
         return message

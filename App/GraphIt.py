@@ -3,7 +3,7 @@ __author__ = 'T0005632'
 import unittest
 import logging
 import sys
-import html
+
 
 try:
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
@@ -11,7 +11,7 @@ try:
 except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
 
-from tools.logstream import StreamRedirector
+from tools.logstream import TextEditHtmlHandler
 from tools.htmlcolorlog import HtmlColoredFormatter
 
 from py2neo import neo4j
@@ -34,54 +34,64 @@ class MainWindow(QMainWindow):
 #        self.ui.aboutQtAction.triggered.connect(QApplication.instance().aboutQt)
 
 
-        #self.ui.textEditLog.setTextFormat()
+        # create formatter
         formatter = HtmlColoredFormatter(
-                                        '{asctime:<20}|{name:.<10}|{log_color}{levelname:.<10}{reset}| {message}{br}',
+                                        '{asctime:<20}|{log_color}{levelname:.<8}{reset}|{name:}|{filename}:{lineno}| {message}',
                                         style='{',
-                                        #"%(log_color)s%(levelname)-8s%(reset)s %(blue)s%(message)s",
                                         datefmt=None,
                                         reset=True,
                                         log_colors={
-                                                    'DEBUG': 'cyan',
+                                                    'DEBUG': 'blue',
                                                     'INFO': 'black',
                                                     'WARNING': 'orange',
                                                     'ERROR': 'red',
                                                     'CRITICAL': 'red',
                                                     }
                                     )
-        logStream = StreamRedirector()
-        logStream.messageWritten.connect(self.ui.textEditLog.insertHtml ) #insertPlainText
 
-        ch = logging.StreamHandler(logStream)
+        #create QTextEdit html handler
+        logHtmlHandler = TextEditHtmlHandler(self.ui.textEditLog)
+        # add formatter to the handlers
+        logHtmlHandler.setFormatter(formatter)
+        # add handler to top level logger
+        logging.getLogger().addHandler(logHtmlHandler)
 
-        # create formatter and add it to the handlers
-        #formatter = logging.Formatter('{asctime:<20}|{name:.<10}|{levelname:.<10}|{message}', style='{')
-        ch.setFormatter(formatter)
 
-        logger.addHandler(ch)
+        if (1):
+            logger.debug('Debug message')
+            logger.info('Log window init <strong>done</strong>')
+            logger.warning('Warning message')
+            logger.error('Error message')
+            logger.critical('Critical message')
 
-        logger.debug('Debug message')
-        logger.info('Log window init <strong>done</strong>')
-        logger.warning('Warning message')
-        logger.error('Error message')
-        logger.critical('Critical message')
-
+        #
+        # Establish connections
+        #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
 
+
     def Neo4jConnect(self):
+
+        self.GraphTest()
 
         try:
             db = "http://localhost:7474/db/data/"
             graph_db = neo4j.GraphDatabaseService(db)
             logger.info('neo4j version: %s', graph_db.neo4j_version)
-        except:
-            logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1])
+        except neo4j.http.SocketError:
+            logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1].__class__.__name__)
+
+    def GraphTest(self):
+
+        logger.info("TestGraph begin")
+
+        logger.info("TestGraph end")
 
 if __name__ == '__main__':
 
 
-    logging.basicConfig(level=logging.DEBUG, format='{asctime:<20}|{name:.<10}|{levelname:.<10}| {message}', style='{')
+    logging.basicConfig(level=logging.DEBUG, format='{asctime:<20}|{levelname:.<8}|{name:}|{filename}:{lineno}| {message}', style='{')
 
     logger.info("Starting application")
     app = QApplication(sys.argv)

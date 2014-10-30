@@ -29,7 +29,7 @@ escape_codes = {
     'orange'    : '<span style="color:orange">',
     'bold'      : '<b>',
     'ebold'     : '</b>',
-    'br'        : '<br/>',
+    'br'        : '<br>',
     'reset'     : '</span>'
 }
 
