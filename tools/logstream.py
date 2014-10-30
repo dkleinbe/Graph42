@@ -2,10 +2,12 @@ __author__ = 'T0005632'
 
 from logging import Handler
 try:
-    from PyQt5.QtCore import (QObject,\
+    from PyQt5.QtCore import (QCoreApplication, \
+                              QObject,\
                               pyqtSignal)
 except ImportError:
-    from PyQt4.QtCore import (QObject,\
+    from PyQt4.QtCore import (QCoreApplication , \
+                              QObject,\
                              pyqtSignal)
 
 class StreamRedirector(QObject):
@@ -66,6 +68,7 @@ class TextEditHtmlHandler(Handler):
 
             text_edit.insertHtml(msg)
             text_edit.insertHtml(self.terminator)
-
+            # force application to process event to display text synchronously
+            QCoreApplication.processEvents()
         except Exception:
             self.handleError(record)
