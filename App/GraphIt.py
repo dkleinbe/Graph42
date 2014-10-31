@@ -7,7 +7,8 @@ import sys
 
 try:
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
-    from PyQt5.QtCore import QFile, QObject, pyqtSignal
+    from PyQt5.QtCore import QFile, QObject, pyqtSignal, QUrl, QResource, QTextStream
+
 except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
 
@@ -69,11 +70,53 @@ class MainWindow(QMainWindow):
         #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
+        jsRes = QResource(":/GraphIt/Resources/vivagraph.min.js")
+        file2 = QFile(jsRes.absoluteFilePath())
+        file2.open(QFile.ReadOnly | QFile.Text)
+        textStream = QTextStream(file2)
+        _vivaGraph = textStream.readAll()
+        file2.close()
+        #self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(str(_vivaGraph))
 
+        self.ui.webViewGraph.page().mainFrame().setHtml("\
+<style>\
+rect {\
+  fill: none;\
+  pointer-events: all;\
+}\
+.node {\
+  fill: #F00;\
+}\
+.cursor {\
+  fill: none;\
+  stroke: brown;\
+  pointer-events: none;\
+}\
+.link {\
+  stroke: #999;\
+}\
+</style>")
+
+        jsRes = QResource(":/GraphIt/Resources/d3.min.js")
+        file3 = QFile(jsRes.absoluteFilePath())
+        file3.open(QFile.ReadOnly | QFile.Text)
+        textStream = QTextStream(file3)
+        _d3 = textStream.readAll()
+        file3.close()
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(_d3)
+
+        jsRes = QResource(":/GraphIt/Resources/d3.test.js")
+        file4 = QFile(jsRes.absoluteFilePath())
+        file4.open(QFile.ReadOnly | QFile.Text)
+        textStream = QTextStream(file4)
+        _d3Test = textStream.readAll()
+        file4.close()
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(_d3Test)
 
     def Neo4jConnect(self):
 
         self.GraphTest()
+        return
 
         try:
             db = "http://localhost:7474/db/data/"
@@ -85,6 +128,12 @@ class MainWindow(QMainWindow):
     def GraphTest(self):
 
         logger.info("TestGraph begin")
+
+
+        aze = "var graph = Viva.Graph.graph(); graph.addLink(1, 2); graph.addLink(1, 3); graph.addLink(2, 3); var renderer = Viva.Graph.View.renderer(graph); renderer.run(); alert(6)"
+        aze = "node = {x: 50, y: 50},n = nodes.push(node), links.push({source: nodes[1], target: nodes[0]});"
+        aze = "links.push({source: nodes[0], target: nodes[1]}); restart();"
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(aze);
 
         logger.info("TestGraph end")
 

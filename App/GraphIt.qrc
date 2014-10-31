@@ -3,5 +3,7 @@
     <file>Resources/icon_quit.png</file>
 	<file>Resources/vivagraph.min.js</file>
 	<file>Resources/vivagraph.custom.js</file>
+	<file>Resources/d3.min.js</file>
+	<file>Resources/d3.test.js</file>
   </qresource>
 </RCC>

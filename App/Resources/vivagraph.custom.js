@@ -1,4 +1,3 @@
-
 var graph = Viva.Graph.graph();
 
 var graphics = Viva.Graph.View.svgGraphics(), nodeSize = 24;
