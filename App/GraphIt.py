@@ -11,6 +11,7 @@ try:
 
 except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
+    from PyQt4.QtCore import QFile, QObject, QResource, QTextStream
 
 from tools.logstream import TextEditHtmlHandler
 from tools.htmlcolorlog import HtmlColoredFormatter
