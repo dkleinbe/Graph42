@@ -7,7 +7,7 @@ import sys
 
 try:
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
-    from PyQt5.QtCore import QFile, QObject, pyqtSignal
+    from PyQt5.QtCore import QFile, QObject, pyqtSignal, qsrand, QTime
 except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
 
@@ -15,6 +15,7 @@ from tools.logstream import TextEditHtmlHandler
 from tools.htmlcolorlog import HtmlColoredFormatter
 
 from py2neo import neo4j
+from graphics.elasticnodes import GraphWidget, Node, Edge
 
 from ui_GraphItApp import Ui_MainWindowUi
 
@@ -57,7 +58,7 @@ class MainWindow(QMainWindow):
         logging.getLogger().addHandler(logHtmlHandler)
 
 
-        if (1):
+        if (0):
             logger.debug('Debug message')
             logger.info('Log window init <strong>done</strong>')
             logger.warning('Warning message')
@@ -68,6 +69,22 @@ class MainWindow(QMainWindow):
         # Establish connections
         #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
+
+        graphWidget = GraphWidget()
+        self.ui.gridLayout.addWidget(graphWidget)
+
+        items = graphWidget.scene().items()
+        logger.debug("Nb node %s", len(items))
+
+        node1 = Node(graphWidget)
+        graphWidget.scene().addItem(node1)
+
+        node2 = Node(graphWidget)
+        graphWidget.scene().addItem(node2)
+
+        graphWidget.scene().addItem(Edge(node1, graphWidget.centerNode))
+
+        node1.setPos(-25, -25)
 
 
 
@@ -91,6 +108,7 @@ class MainWindow(QMainWindow):
 if __name__ == '__main__':
 
 
+    qsrand(QTime(0,0,0).secsTo(QTime.currentTime()))
     logging.basicConfig(level=logging.DEBUG, format='{asctime:<20}|{levelname:.<8}|{name:}|{filename}:{lineno}| {message}', style='{')
 
     logger.info("Starting application")
