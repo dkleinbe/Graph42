@@ -1,6 +1,5 @@
 __author__ = 'T0005632'
 
-import unittest
 import logging
 import sys
 
@@ -13,8 +12,8 @@ except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
     from PyQt4.QtCore import QFile, QObject, QResource, QTextStream
 
-from tools.logstream import TextEditHtmlHandler
-from tools.htmlcolorlog import HtmlColoredFormatter
+from tools.log.logstream import TextEditHtmlHandler
+from tools.log.htmlcolorlog import HtmlColoredFormatter
 
 from py2neo import neo4j
 
