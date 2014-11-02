@@ -14,6 +14,8 @@ except ImportError:
 
 from tools.log.logstream import TextEditHtmlHandler
 from tools.log.htmlcolorlog import HtmlColoredFormatter
+from tools.myutils import ReadResourceTextFile
+
 
 from py2neo import neo4j
 
@@ -70,13 +72,6 @@ class MainWindow(QMainWindow):
         #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
-        jsRes = QResource(":/GraphIt/Resources/vivagraph.min.js")
-        file2 = QFile(jsRes.absoluteFilePath())
-        file2.open(QFile.ReadOnly | QFile.Text)
-        textStream = QTextStream(file2)
-        _vivaGraph = textStream.readAll()
-        file2.close()
-        #self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(str(_vivaGraph))
 
         self.ui.webViewGraph.page().mainFrame().setHtml("\
 <style>\
@@ -97,21 +92,12 @@ rect {\
 }\
 </style>")
 
-        jsRes = QResource(":/GraphIt/Resources/d3.min.js")
-        file3 = QFile(jsRes.absoluteFilePath())
-        file3.open(QFile.ReadOnly | QFile.Text)
-        textStream = QTextStream(file3)
-        _d3 = textStream.readAll()
-        file3.close()
-        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(_d3)
 
-        jsRes = QResource(":/GraphIt/Resources/d3.test.js")
-        file4 = QFile(jsRes.absoluteFilePath())
-        file4.open(QFile.ReadOnly | QFile.Text)
-        textStream = QTextStream(file4)
-        _d3Test = textStream.readAll()
-        file4.close()
-        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(_d3Test)
+        d3 = ReadResourceTextFile(":/GraphIt/Resources/d3.min.js")
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3)
+
+        d3Test = ReadResourceTextFile(":/GraphIt/Resources/d3.test.js")
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3Test)
 
     def Neo4jConnect(self):
 
