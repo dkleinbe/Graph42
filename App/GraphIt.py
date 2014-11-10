@@ -96,7 +96,16 @@ rect {\
         d3 = ReadResourceTextFile(":/GraphIt/Resources/d3.min.js")
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3)
 
-        d3Test = ReadResourceTextFile(":/GraphIt/Resources/d3.test.js")
+        useResource = False
+        if (useResource):
+            d3Test = ReadResourceTextFile(":/GraphIt/Resources/d3.test.js")
+        else:
+            file = QFile("./Resources/d3.test.js")
+            file.open(QFile.ReadOnly | QFile.Text)
+            textStream = QTextStream(file)
+            d3Test = textStream.readAll()
+            file.close()
+
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3Test)
 
     def Neo4jConnect(self):
