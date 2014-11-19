@@ -16,10 +16,9 @@ from tools.log.logstream import TextEditHtmlHandler
 from tools.log.htmlcolorlog import HtmlColoredFormatter
 from tools.myutils import ReadResourceTextFile
 
-
-from py2neo import neo4j
-
 from ui_GraphItApp import Ui_MainWindowUi
+
+from GraphDatabase import GraphDatabase
 
 
 logger = logging.getLogger(__name__)
@@ -60,7 +59,7 @@ class MainWindow(QMainWindow):
         logging.getLogger().addHandler(logHtmlHandler)
 
 
-        if (1):
+        if (0):
             logger.debug('Debug message')
             logger.info('Log window init <strong>done</strong>')
             logger.warning('Warning message')
@@ -111,14 +110,14 @@ rect {\
     def Neo4jConnect(self):
 
         self.GraphTest()
-        return
 
-        try:
-            db = "http://localhost:7474/db/data/"
-            graph_db = neo4j.GraphDatabaseService(db)
-            logger.info('neo4j version: %s', graph_db.neo4j_version)
-        except neo4j.http.SocketError:
-            logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1].__class__.__name__)
+        graphDB = GraphDatabase()
+
+        graphDB.Connect()
+
+        node = graphDB.GetNode(0)
+        logger.info("node: %s", node)
+        logger.info("node degree: %s", node.degree)
 
     def GraphTest(self):
 
