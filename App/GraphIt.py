@@ -21,7 +21,7 @@ from ui_GraphItApp import Ui_MainWindowUi
 from GraphDatabase import GraphDatabase
 
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("Graph42") # __name__
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -56,7 +56,8 @@ class MainWindow(QMainWindow):
         # add formatter to the handlers
         logHtmlHandler.setFormatter(formatter)
         # add handler to top level logger
-        logging.getLogger().addHandler(logHtmlHandler)
+        #logging.getLogger().addHandler(logHtmlHandler)
+        logger.addHandler(logHtmlHandler)
 
 
         if (0):
@@ -109,15 +110,25 @@ rect {\
 
     def Neo4jConnect(self):
 
-        self.GraphTest()
+
 
         graphDB = GraphDatabase()
 
         graphDB.Connect()
 
-        node = graphDB.GetNode(0)
+        node = graphDB.node(0)
         logger.info("node: %s", node)
-        logger.info("node degree: %s", node.degree)
+        logger.info("node degree: %s", node.degree())
+
+        for rel in node.relationships():
+            logger.info("relation: %s <-%s-> %s",
+                        rel.start_node().properties("name"),
+                        rel.type(),
+                        rel.end_node().labels())
+
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript("nodes.push({x: 10, y: 10});")
+
+        self.GraphTest()
 
     def GraphTest(self):
 
