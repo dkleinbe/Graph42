@@ -52,10 +52,21 @@ class HtmlColoredFormatter(logging.Formatter):
         self.log_colors = log_colors
         self.reset = reset
 
+    def formatMessage(self, record):
+
+        record.message = html.escape(record.message)
+        # Format the message
+        if sys.version_info > (2, 7):
+            message = super(HtmlColoredFormatter, self).formatMessage(record)
+        else:
+            message = logging.Formatter.formatMessage(self, record)
+
+        return message
+
     def format(self, record):
 
         # Escape html code in message
-        record.msg = html.escape(record.msg)
+        #record.msg = html.escape(record.msg)
 
         # Add the color codes to the record
         record.__dict__.update(escape_codes)
