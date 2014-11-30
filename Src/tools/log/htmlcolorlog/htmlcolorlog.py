@@ -6,7 +6,7 @@ import logging
 import sys
 import html
 
-from tools.log.htmlcolorlog.escape_codes import escape_codes
+from Src.tools.log.htmlcolorlog.escape_codes import escape_codes
 
 
 __all__ = ['escape_codes', 'default_log_colors', 'HtmlColoredFormatter']

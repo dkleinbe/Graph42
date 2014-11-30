@@ -13,16 +13,19 @@ class GraphDatabase:
     def __init__(self):
         pass
 
-    def Connect(self):
+    def connect(self):
         try:
             db = "http://localhost:7474/db/data/"
-            self. graph_db = neo4j.Graph(db)
+            self.graph_db = neo4j.Graph(db)
             logger.info('neo4j version: %s', self.graph_db.neo4j_version)
-        except neo4j.http.SocketError:
+        except :
             logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1].__class__.__name__)
 
     def node(self, node_id):
-
+        """
+        :param node_id: node's Id
+        :return: GraphNode
+        """
         rel_types = self.graph_db.relationship_types
         node = self.graph_db.node(node_id)
 
@@ -36,6 +39,9 @@ class GraphNode:
         self.node = node
 
     def labels(self):
+        """
+        :return: labels set
+        """
         return self.node.labels
 
     def degree(self):
@@ -44,16 +50,22 @@ class GraphNode:
         """
         return self.node.degree
 
-    def properties(self, name):
+    def property(self, key):
         """
-        :param name: property name
+        :param key: property name
         :return: property value
         """
-        return self.node.properties[name]
+        return self.node.properties[key]
+
+    def properties(self):
+        """
+        :return: node's properties dict
+        """
+        return self.node.properties
 
     def relationships(self):
         """
-        :return: relationships iterator
+        :return: node's relationships iterator
         """
         for rel in self.node.match():
             i_rel = GraphRelation(rel)
@@ -67,12 +79,21 @@ class GraphRelation:
         self.relation = relation
 
     def type(self):
+        """
+        :return: relation type
+        """
         return self.relation.type
 
     def start_node(self):
+        """
+        :return: start :class:`.GraphNode` of the relation
+        """
         return GraphNode(self.relation.start_node)
 
     def end_node(self):
+        """
+        :return: end GraphNode of the relation
+        """
         return GraphNode(self.relation.end_node)
 
 

@@ -5,7 +5,7 @@ from __future__ import absolute_import
 import functools
 import logging
 
-from tools.log.htmlcolorlog.htmlcolorlog import HtmlColoredFormatter
+from Src.tools.log.htmlcolorlog.htmlcolorlog import HtmlColoredFormatter
 
 
 BASIC_FORMAT = "%(log_color)s%(levelname)s%(reset)s:%(name)s:%(message)s"

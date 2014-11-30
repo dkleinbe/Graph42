@@ -2,7 +2,7 @@
 
 from __future__ import absolute_import
 
-from tools.log.htmlcolorlog.htmlcolorlog import (
+from Src.tools.log.htmlcolorlog.htmlcolorlog import (
     HtmlColoredFormatter, escape_codes, default_log_colors)
 
 __all__ = [

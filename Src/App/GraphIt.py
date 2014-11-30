@@ -12,9 +12,9 @@ except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
     from PyQt4.QtCore import QFile, QObject, QResource, QTextStream
 
-from tools.log.logstream import TextEditHtmlHandler
-from tools.log.htmlcolorlog import HtmlColoredFormatter
-from tools.myutils import ReadResourceTextFile
+from Src.tools.log.logstream import TextEditHtmlHandler
+from Src.tools.log.htmlcolorlog import HtmlColoredFormatter
+from Src.tools.myutils import ReadResourceTextFile
 
 from ui_GraphItApp import Ui_MainWindowUi
 
@@ -114,17 +114,24 @@ rect {\
 
         graphDB = GraphDatabase()
 
-        graphDB.Connect()
+        graphDB.connect()
 
-        node = graphDB.node(0)
+        node = graphDB.node(1)
         logger.info("node: %s", node)
         logger.info("node degree: %s", node.degree())
 
+        props = node.properties()
+
+        for propName, propValue in props.items():
+            logger.info("prop : %s %s", propName, propValue )
         for rel in node.relationships():
+            labels = rel.end_node().labels()
+            for label in labels:
+                logger.info("labels : %s", label)
             logger.info("relation: %s <-%s-> %s",
-                        rel.start_node().properties("name"),
+                        rel.start_node().property("name"),
                         rel.type(),
-                        rel.end_node().labels())
+                        label)
 
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript("nodes.push({x: 10, y: 10});")
 
