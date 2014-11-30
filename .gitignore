@@ -1,4 +1,5 @@
 **/__pycache__/*
 .idea/
+Doc/build/
 *_rc.py
 ui_*.py
