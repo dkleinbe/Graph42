@@ -12,13 +12,15 @@ except ImportError:
     from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
     from PyQt4.QtCore import QFile, QObject, QResource, QTextStream
 
-from Src.tools.log.logstream import TextEditHtmlHandler
-from Src.tools.log.htmlcolorlog import HtmlColoredFormatter
-from Src.tools.myutils import ReadResourceTextFile
+from graph42.tools.log.logstream import TextEditHtmlHandler
+from graph42.tools.log.htmlcolorlog import HtmlColoredFormatter
+from graph42.tools.myutils import ReadResourceTextFile
 
-from ui_GraphItApp import Ui_MainWindowUi
+from graph42.graphics.D3Graph import D3Graph
 
-from GraphDatabase import GraphDatabase
+from graph42.app.ui_GraphItApp import Ui_MainWindowUi
+
+from graph42.app.GraphDatabase import GraphDatabase,GraphNode, GraphRelation
 
 
 logger = logging.getLogger("Graph42") # __name__
@@ -112,11 +114,12 @@ rect {\
 
 
 
-        graphDB = GraphDatabase()
+        self.graphDB = GraphDatabase()
 
-        graphDB.connect()
+        logger.info("Connecting to database")
+        self.graphDB.connect()
 
-        node = graphDB.node(1)
+        node = self.graphDB.node(1)
         logger.info("node: %s", node)
         logger.info("node degree: %s", node.degree())
 
@@ -128,24 +131,37 @@ rect {\
             labels = rel.end_node().labels()
             for label in labels:
                 logger.info("labels : %s", label)
-            logger.info("relation: %s <-%s-> %s",
+            logger.info("relation: %s <-%s-> %s %s",
                         rel.start_node().property("name"),
                         rel.type(),
-                        label)
+                        label,
+                        rel.end_node().property("title"))
 
-        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript("nodes.push({x: 10, y: 10});")
 
         self.GraphTest()
+
 
     def GraphTest(self):
 
         logger.info("TestGraph begin")
 
+        rec_list = self.graphDB.execute_cypher("MATCH (n:`Movie`) RETURN n LIMIT 25")
+        print(rec_list)
 
-        aze = "var graph = Viva.Graph.graph(); graph.addLink(1, 2); graph.addLink(1, 3); graph.addLink(2, 3); var renderer = Viva.Graph.View.renderer(graph); renderer.run(); alert(6)"
-        aze = "node = {x: 50, y: 50},n = nodes.push(node), links.push({source: nodes[1], target: nodes[0]});"
-        aze = "links.push({source: nodes[0], target: nodes[1]}); restart();"
-        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(aze);
+        n1 = self.graphDB.node(1)
+        n2 = self.graphDB.node(2)
+        n3 = GraphNode()
+
+        d3graph = D3Graph(self.ui.webViewGraph.page().mainFrame())
+
+        d3graph.add_node(n1)
+        for rel in n1.relationships():
+            d3graph.add_node(rel.end_node())
+            d3graph.add_link(n1, rel.end_node(), rel.type())
+
+        d3graph.add_link(self.graphDB.node(100), self.graphDB.node(154), "TOTO")
+
+        d3graph.restart()
 
         logger.info("TestGraph end")
 

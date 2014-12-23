@@ -31,12 +31,27 @@ class GraphDatabase:
 
         return GraphNode(node)
 
+    def execute_cypher(self, stmt):
+
+        record_list = self.graph_db.cypher.execute(stmt)
+        return record_list
+
 
 class GraphNode:
 
-    def __init__(self, node):
+    def __init__(self, node=None):
 
-        self.node = node
+        if node is None:
+            self.node = Node()
+        else:
+            self.node = node
+
+    def id(self):
+        """
+        :return: node's unique Id
+        """
+
+        return self.node._id
 
     def labels(self):
         """

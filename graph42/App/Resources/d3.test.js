@@ -5,7 +5,7 @@ var fill = d3.scale.category20();
 
 var force = d3.layout.force()
     .size([width, height])
-    .nodes([{}]) // initialize with a single node
+    // .nodes([{}]) // initialize with a single node
     .linkDistance(30)
     .charge(-60)
     .on("tick", tick);
