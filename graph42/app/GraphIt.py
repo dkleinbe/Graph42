@@ -74,37 +74,15 @@ class MainWindow(QMainWindow):
         #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
-        if (1):
-            self.ui.webViewGraph.page().mainFrame().setHtml("\
-<style>\
-rect {\
-  fill: none;\
-  pointer-events: all;\
-}\
-.node {\
-  fill: #F00;\
-}\
-.node text { \
-  pointer-events: none; \
-  font: 10px sans-serif; \
-} \
-.cursor {\
-  fill: none;\
-  stroke: brown;\
-  pointer-events: none;\
-}\
-.link {\
-  stroke: #999;\
-}\
-</style>")
-
-
+        #
+        # Read resource files
+        #
         d3 = ReadResourceTextFile(":/GraphIt/Resources/d3.min.js")
-        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3)
 
         useResource = False
         if (useResource):
             d3Test = ReadResourceTextFile(":/GraphIt/Resources/d3.test.js")
+            body = ReadResourceTextFile(":/GraphIt/Resources/d3body.html")
         else:
             file = QFile("./Resources/d3.test.js")
             file.open(QFile.ReadOnly | QFile.Text)
@@ -112,10 +90,19 @@ rect {\
             d3Test = textStream.readAll()
             file.close()
 
+            file = QFile("./Resources/d3body.html")
+            file.open(QFile.ReadOnly | QFile.Text)
+            textStream = QTextStream(file)
+            body = textStream.readAll()
+            file.close()
+        #
+        # set html frame content
+        #
+        self.ui.webViewGraph.page().mainFrame().setHtml(body)
+        self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3)
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3Test)
 
     def Neo4jConnect(self):
-
 
 
         self.graphDB = GraphDatabase()
@@ -163,7 +150,6 @@ rect {\
             d3graph.add_node(rel.end_node())
             d3graph.add_link(n1, rel.end_node(), rel.type())
 
-        d3graph.add_link(self.graphDB.node(100), self.graphDB.node(154), "TOTO")
 
         d3graph.restart()
 

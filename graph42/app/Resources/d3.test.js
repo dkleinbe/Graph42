@@ -5,9 +5,10 @@ var fill = d3.scale.category20();
 
 var force = d3.layout.force()
     .size([width, height])
-    .nodes([{"name": "TOTO"}]) // initialize with a single node
-    .linkDistance(30)
-    .charge(-60)
+    //.nodes([{"name": "TOTO"}]) // initialize with a single node
+    .nodes([])
+    .linkDistance(90)
+    .charge(-180)
     .on("tick", tick);
 
 var svg = d3.select("body").append("svg")
@@ -55,33 +56,40 @@ function mousedown() {
 }
 
 function tick() {
-  link.attr("x1", function(d) { return d.source.x; })
+
+    // Place link
+    link.attr("x1", function(d) { return d.source.x; })
       .attr("y1", function(d) { return d.source.y; })
       .attr("x2", function(d) { return d.target.x; })
       .attr("y2", function(d) { return d.target.y; });
 
-  node.attr("cx", function(d) { return d.x; })
-      .attr("cy", function(d) { return d.y; });
+    // Translate node
+    node.attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
 }
 
 function restart() {
-  link = link.data(links);
+    link = link.data(links);
 
-  link.enter().insert("line", ".node")
+    link.enter().insert("line", ".node")
       .attr("class", "link");
 
-  node = node.data(nodes);
+    node = node.data(nodes);
 
-  node.enter().insert("circle", ".cursor")
-      .attr("class", "node")
-      .attr("r", 5)
-      .call(force.drag);
+    // Append group to hold node representation
+    anode = node.enter().append("g").attr("class", "node");
 
-    if (1)
-        node.enter().insert("text")
-            .attr("dx", 12)
-            .attr("dy", ".35em")
-            .text(function(d) { return d.name });
+    // Append node point
+    anode.append("circle", ".cursor")
+        .attr("class", "node")
+        .attr("r", 5);
 
-  force.start();
+    // Append node label
+    anode.append("text")
+        .attr("class", "node")
+        .attr("dx", 12)
+        .attr("dy", ".35em")
+        .text(function(d) { return d.name })
+        .call(force.drag);
+
+    force.start();
 }
