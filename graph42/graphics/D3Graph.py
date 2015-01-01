@@ -50,7 +50,13 @@ class D3Graph:
         if (node.id() in self.__nodes):
             return
 
-        d3_node_id = self.frame.evaluateJavaScript("nodes.push({index: " + str(node.id()) + "});") - 1
+        js = "nodes.push({index: " + \
+                            str(node.id()) + \
+                            ", name: \"" + \
+                            str(node.id()) + \
+                            "\" });"
+
+        d3_node_id = self.frame.evaluateJavaScript(js) - 1
         self.__nodes[node.id()] = str(d3_node_id)
         logger.info("node id %s - > d3 id: %s", node.id(), d3_node_id)
 

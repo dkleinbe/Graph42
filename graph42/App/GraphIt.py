@@ -74,8 +74,8 @@ class MainWindow(QMainWindow):
         #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
-
-        self.ui.webViewGraph.page().mainFrame().setHtml("\
+        if (1):
+            self.ui.webViewGraph.page().mainFrame().setHtml("\
 <style>\
 rect {\
   fill: none;\
@@ -84,6 +84,10 @@ rect {\
 .node {\
   fill: #F00;\
 }\
+.node text { \
+  pointer-events: none; \
+  font: 10px sans-serif; \
+} \
 .cursor {\
   fill: none;\
   stroke: brown;\

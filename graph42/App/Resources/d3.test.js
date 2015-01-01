@@ -5,7 +5,7 @@ var fill = d3.scale.category20();
 
 var force = d3.layout.force()
     .size([width, height])
-    // .nodes([{}]) // initialize with a single node
+    .nodes([{"name": "TOTO"}]) // initialize with a single node
     .linkDistance(30)
     .charge(-60)
     .on("tick", tick);
@@ -25,6 +25,7 @@ var nodes = force.nodes(),
     node = svg.selectAll(".node"),
     link = svg.selectAll(".link");
 
+
 var cursor = svg.append("circle")
     .attr("r", 30)
     .attr("transform", "translate(-100,-100)")
@@ -38,7 +39,7 @@ function mousemove() {
 
 function mousedown() {
   var point = d3.mouse(this),
-      node = {x: point[0], y: point[1]},
+      node = {x: point[0], y: point[1], name: "COUCOU"},
       n = nodes.push(node);
 
   // add links to any nearby nodes
@@ -75,6 +76,12 @@ function restart() {
       .attr("class", "node")
       .attr("r", 5)
       .call(force.drag);
+
+    if (1)
+        node.enter().insert("text")
+            .attr("dx", 12)
+            .attr("dy", ".35em")
+            .text(function(d) { return d.name });
 
   force.start();
 }
