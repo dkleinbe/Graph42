@@ -16,7 +16,7 @@ from graph42.tools.log.logstream import TextEditHtmlHandler
 from graph42.tools.log.htmlcolorlog import HtmlColoredFormatter
 from graph42.tools.myutils import ReadResourceTextFile
 
-from graph42.graphics.D3Graph import D3Graph
+from graph42.graphics.D3Graph import D3Graph, Js2PyBridge
 
 from graph42.app.ui_GraphItApp import Ui_MainWindowUi
 
@@ -95,6 +95,9 @@ class MainWindow(QMainWindow):
             textStream = QTextStream(file)
             body = textStream.readAll()
             file.close()
+
+
+
         #
         # set html frame content
         #
@@ -102,8 +105,10 @@ class MainWindow(QMainWindow):
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3)
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3Test)
 
-    def Neo4jConnect(self):
+        self.js2py = Js2PyBridge()
+        self.ui.webViewGraph.page().mainFrame().addToJavaScriptWindowObject('py2js', self.js2py)
 
+    def Neo4jConnect(self):
 
         self.graphDB = GraphDatabase()
 

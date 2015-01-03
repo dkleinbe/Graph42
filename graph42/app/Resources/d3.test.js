@@ -14,7 +14,7 @@ var force = d3.layout.force()
 var svg = d3.select("body").append("svg")
     .attr("width", width)
     .attr("height", height)
-    .on("mousemove", mousemove)
+    //.on("mousemove", mousemove);
     .on("mousedown", mousedown);
 
 svg.append("rect")
@@ -39,6 +39,9 @@ function mousemove() {
 }
 
 function mousedown() {
+
+  py2js.showMessage('Hello from WebKit');
+
   var point = d3.mouse(this),
       node = {x: point[0], y: point[1], name: "COUCOU"},
       n = nodes.push(node);
@@ -76,7 +79,7 @@ function restart() {
     node = node.data(nodes);
 
     // Append group to hold node representation
-    anode = node.enter().append("g").attr("class", "node");
+    anode = node.enter().append("g").attr("class", "node").call(force.drag);
 
     // Append node point
     anode.append("circle", ".cursor")
@@ -88,8 +91,7 @@ function restart() {
         .attr("class", "node")
         .attr("dx", 12)
         .attr("dy", ".35em")
-        .text(function(d) { return d.name })
-        .call(force.drag);
+        .text(function(d) { return d.name });
 
     force.start();
 }

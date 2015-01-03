@@ -3,8 +3,35 @@ __author__ = 'T0005632'
 import logging
 import sys
 
-logger = logging.getLogger("Graph42") # __main__
+try:
+    from PyQt5 import QtCore, QtGui, QtWebKit
+    from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QWidget
+    from PyQt5.QtCore import pyqtSlot
+except ImportError:
+    from PyQt4 import QtCore, QtGui, QtWebKit
+
+
+logger = logging.getLogger("Graph42")  # __main__
 logger.addHandler(logging.NullHandler())
+
+class Js2PyBridge(QWidget):
+
+    @pyqtSlot(str)
+    def showMessage(self, msg):
+        """Open a message box and display the specified message."""
+        msgBox = QMessageBox()
+        msgBox.setText(msg)
+        #msgBox.setInformativeText("Do you want to save your changes?")
+        #msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        #msgBox.setDefaultButton(QMessageBox::Save);
+        ret = msgBox.exec();
+
+    def _pyVersion(self):
+        """Return the Python version."""
+        return sys.version
+
+    """Python interpreter version property."""
+    pyVersion = QtCore.pyqtProperty(str, fget=_pyVersion)
 
 class D3Graph:
 
