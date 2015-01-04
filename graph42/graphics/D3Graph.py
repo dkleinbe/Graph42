@@ -15,7 +15,8 @@ logger = logging.getLogger("Graph42")  # __main__
 logger.addHandler(logging.NullHandler())
 
 class Js2PyBridge(QWidget):
-
+    """ A class to bridge Javascript world and PyQt world
+    """
     @pyqtSlot(str)
     def showMessage(self, msg):
         """Open a message box and display the specified message."""
@@ -24,6 +25,16 @@ class Js2PyBridge(QWidget):
         #msgBox.setInformativeText("Do you want to save your changes?")
         #msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         #msgBox.setDefaultButton(QMessageBox::Save);
+        ret = msgBox.exec();
+
+    @pyqtSlot(int)
+    def node_selected(self, d3_id):
+        """
+        :param d3_id: node id in d3.js world
+        :return:
+        """
+        msgBox = QMessageBox()
+        msgBox.setText(str(d3_id))
         ret = msgBox.exec();
 
     def _pyVersion(self):
@@ -37,6 +48,7 @@ class D3Graph:
 
     __nodes = dict()
     __links = dict()
+    __labels = dict()
 
     def __init__(self, frame):
         self.frame = frame
@@ -74,14 +86,20 @@ class D3Graph:
         """
 
         # Add node only if it does not exist yet
-        if (node.id() in self.__nodes):
+        if node.id() in self.__nodes:
             return
 
-        js = "nodes.push({index: " + \
-                            str(node.id()) + \
-                            ", name: \"" + \
-                            str(node.id()) + \
-                            "\" });"
+        labels = node.labels()
+        for label in labels:
+                break
+
+        if label not in self.__labels:
+            self.__labels[label] = len(self.__labels)
+
+        js = "nodes.push({index: " + str(node.id()) + ", " +\
+                        "name: \"" + str(node.id()) + "\", " +\
+                        "group: " + str(self.__labels[label]) + \
+                            " });"
 
         d3_node_id = self.frame.evaluateJavaScript(js) - 1
         self.__nodes[node.id()] = str(d3_node_id)

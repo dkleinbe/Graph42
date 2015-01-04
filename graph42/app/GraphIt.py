@@ -70,7 +70,7 @@ class MainWindow(QMainWindow):
             logger.critical('Critical message')
 
         #
-        # Establish connections
+        # Establish Qt connections
         #
         self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
@@ -95,9 +95,6 @@ class MainWindow(QMainWindow):
             textStream = QTextStream(file)
             body = textStream.readAll()
             file.close()
-
-
-
         #
         # set html frame content
         #
@@ -106,7 +103,7 @@ class MainWindow(QMainWindow):
         self.ui.webViewGraph.page().mainFrame().evaluateJavaScript(d3Test)
 
         self.js2py = Js2PyBridge()
-        self.ui.webViewGraph.page().mainFrame().addToJavaScriptWindowObject('py2js', self.js2py)
+        self.ui.webViewGraph.page().mainFrame().addToJavaScriptWindowObject('js2py', self.js2py)
 
     def Neo4jConnect(self):
 
@@ -133,7 +130,6 @@ class MainWindow(QMainWindow):
                         label,
                         rel.end_node().property("title"))
 
-
         self.GraphTest()
 
 
@@ -154,7 +150,6 @@ class MainWindow(QMainWindow):
         for rel in n1.relationships():
             d3graph.add_node(rel.end_node())
             d3graph.add_link(n1, rel.end_node(), rel.type())
-
 
         d3graph.restart()
 
