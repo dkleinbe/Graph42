@@ -9,6 +9,8 @@ try:
     from PyQt5.QtCore import pyqtSlot
 except ImportError:
     from PyQt4 import QtCore, QtGui, QtWebKit
+    from PyQt4.QtGui import QWidget, QMessageBox
+    from PyQt4.QtCore import pyqtSlot, pyqtProperty
 
 
 logger = logging.getLogger("Graph42")  # __main__

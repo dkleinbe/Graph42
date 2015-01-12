@@ -9,13 +9,14 @@ try:
     from PyQt5.QtCore import QFile, QObject, pyqtSignal, QUrl, QResource, QTextStream
 
 except ImportError:
-    from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox
+    from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton
     from PyQt4.QtCore import QFile, QObject, QResource, QTextStream
 
 from graph42.tools.log.logstream import TextEditHtmlHandler
 from graph42.tools.log.htmlcolorlog import HtmlColoredFormatter
 from graph42.tools.myutils import ReadResourceTextFile
 
+from graph42.ui.flowlayout import FlowLayout
 from graph42.graphics.D3Graph import D3Graph, Js2PyBridge
 
 from graph42.app.ui_GraphItApp import Ui_MainWindowUi
@@ -32,6 +33,14 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindowUi()
         self.ui.setupUi(self)
 
+        self.labelFlowLayout = FlowLayout(self.ui.groupNodeLabels)
+        self.labelFlowLayout.addWidget(QPushButton("Short"))
+        self.labelFlowLayout.addWidget(QPushButton("Longer"))
+        self.labelFlowLayout.addWidget(QPushButton("Different text"))
+        self.labelFlowLayout.addWidget(QPushButton("More text"))
+        self.labelFlowLayout.addWidget(QPushButton("Even longer button text"))
+
+        self.ui.groupNodeLabels.setLayout(self.labelFlowLayout)
 
         # create connections
 #        self.ui.exitAction.triggered.connect(QApplication.instance().quit)
