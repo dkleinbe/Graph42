@@ -5,7 +5,7 @@ import sys
 
 
 try:
-    from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox
+    from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton
     from PyQt5.QtCore import QFile, QObject, pyqtSignal, QUrl, QResource, QTextStream
 
 except ImportError:
@@ -33,12 +33,8 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindowUi()
         self.ui.setupUi(self)
 
+        self.relTypesFlowLayout = FlowLayout(self.ui.groupRelTypes)
         self.labelFlowLayout = FlowLayout(self.ui.groupNodeLabels)
-        self.labelFlowLayout.addWidget(QPushButton("Short"))
-        self.labelFlowLayout.addWidget(QPushButton("Longer"))
-        self.labelFlowLayout.addWidget(QPushButton("Different text"))
-        self.labelFlowLayout.addWidget(QPushButton("More text"))
-        self.labelFlowLayout.addWidget(QPushButton("Even longer button text"))
 
         self.ui.groupNodeLabels.setLayout(self.labelFlowLayout)
 
@@ -120,6 +116,16 @@ class MainWindow(QMainWindow):
 
         logger.info("Connecting to database")
         self.graphDB.connect()
+        #
+        # Add label buttons
+        #
+        for label in self.graphDB.node_labels_set():
+            self.labelFlowLayout.addWidget(QPushButton(label))
+        #
+        # Add relation buttons
+        #
+        for rel in self.graphDB.relationship_types():
+            self.relTypesFlowLayout.addWidget(QPushButton(rel))
 
         node = self.graphDB.node(1)
         logger.info("node: %s", node)
@@ -165,9 +171,9 @@ class MainWindow(QMainWindow):
         logger.info("TestGraph end")
 
 if __name__ == '__main__':
-
-
-    logging.basicConfig(level=logging.DEBUG, format='{asctime:<20}|{levelname:.<8}|{name:}|{filename}:{lineno}| {message}', style='{')
+    logging.basicConfig(level=logging.DEBUG,
+                        format='{asctime:<20}|{levelname:.<8}|{name:}|{filename}:{lineno}| {message}',
+                        style='{')
 
     logger.info("Starting application")
     app = QApplication(sys.argv)

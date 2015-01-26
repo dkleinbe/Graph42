@@ -6,11 +6,11 @@ import sys
 try:
     from PyQt5 import QtCore, QtGui, QtWebKit
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QWidget
-    from PyQt5.QtCore import pyqtSlot
+    from PyQt5.QtCore import pyqtSlot, QVariant
 except ImportError:
     from PyQt4 import QtCore, QtGui, QtWebKit
     from PyQt4.QtGui import QWidget, QMessageBox
-    from PyQt4.QtCore import pyqtSlot, pyqtProperty
+    from PyQt4.QtCore import pyqtSlot, pyqtProperty, QVariant
 
 
 logger = logging.getLogger("Graph42")  # __main__
@@ -27,6 +27,12 @@ class Js2PyBridge(QWidget):
         #msgBox.setInformativeText("Do you want to save your changes?")
         #msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
         #msgBox.setDefaultButton(QMessageBox::Save);
+        ret = msgBox.exec();
+
+    @pyqtSlot(QVariant)
+    def send_event(self, evt):
+        msgBox = QMessageBox()
+        msgBox.setText(str(evt['type']) + ": " + str(int(evt['node_id'])))
         ret = msgBox.exec();
 
     @pyqtSlot(int)
