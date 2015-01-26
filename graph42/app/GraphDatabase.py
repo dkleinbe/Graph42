@@ -8,6 +8,7 @@ from py2neo import neo4j, Node
 logger = logging.getLogger("Graph42") # __main__
 logger.addHandler(logging.NullHandler())
 
+
 class GraphDatabase:
 
     def __init__(self):
@@ -20,6 +21,20 @@ class GraphDatabase:
             logger.info('neo4j version: %s', self.graph_db.neo4j_version)
         except :
             logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1].__class__.__name__)
+
+    def node_labels_set(self):
+        """
+        The set of node labels currently defined within the graph
+        :return:
+        """
+        return self.graph_db.node_labels
+
+    def relationship_types(self):
+        """
+        The set of relationship types currently defined within the graph
+        :return:
+        """
+        return self.graph_db.relationship_types
 
     def node(self, node_id):
         """
