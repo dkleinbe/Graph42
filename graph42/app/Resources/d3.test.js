@@ -57,7 +57,7 @@ var node_drag = d3.behavior.drag()
 function dragstart(d, i) {
 
     d3.select(this).classed("fixed", d.fixed = true);
-
+    force.resume();
 }
 
 function dragmove(d, i) {
@@ -120,6 +120,7 @@ function tick() {
 function nodeselected()
 {
     js2py.node_selected(d3.select(this).node().__data__.index);
+    js2py.send_event({type: "node_selected", node_id: d3.select(this).node().__data__.index })
 }
 
 function restart() {
