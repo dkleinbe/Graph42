@@ -1,0 +1,11 @@
+<scxml initial="INIT" version="0.9" xmlns="http://www.w3.org/2005/07/scxml"><!--   node-size-and-position x=50 y=50 w=570 h=510  -->
+ <state id="INIT"><!--   node-size-and-position x=200 y=40 w=75 h=75  -->
+  <datamodel>python</datamodel>
+  <transition event="exitEvt" target="FINAL"><!--   edge-path [FINAL]  x=80 y=80 x=80 y=420 pointx=0 pointy=-30 offsetx=0 offsety=-25  --></transition>
+  <transition event="connectionOkEvt" target="CONNECTED"></transition>
+ </state>
+ <state id="FINAL"><!--   node-size-and-position x=210 y=380 w=75 h=75  --></state>
+ <state id="CONNECTED"><!--   node-size-and-position x=380 y=210 w=75 h=75  -->
+  <transition event="exitEvt" target="FINAL"></transition>
+ </state>
+</scxml>

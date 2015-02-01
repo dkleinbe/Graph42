@@ -14,12 +14,12 @@ except ImportError:
 
 from graph42.tools.log.logstream import TextEditHtmlHandler
 from graph42.tools.log.htmlcolorlog import HtmlColoredFormatter
-from graph42.tools.myutils import ReadResourceTextFile
+from graph42.tools.myutils import ReadResourceTextFile, ReadTextFile
 
 from graph42.ui.flowlayout import FlowLayout
 from graph42.graphics.D3Graph import D3Graph, Js2PyBridge
 
-from graph42.app.ui_GraphItApp import Ui_MainWindowUi
+from graph42.ui.ui_GraphItApp import Ui_MainWindowUi
 
 from graph42.app.GraphDatabase import GraphDatabase,GraphNode, GraphRelation
 
@@ -82,24 +82,16 @@ class MainWindow(QMainWindow):
         #
         # Read resource files
         #
-        d3 = ReadResourceTextFile(":/GraphIt/Resources/d3.min.js")
-
         useResource = False
         if (useResource):
+            d3 = ReadResourceTextFile(":/GraphIt/Resources/d3.min.js")
             d3Test = ReadResourceTextFile(":/GraphIt/Resources/d3.test.js")
             body = ReadResourceTextFile(":/GraphIt/Resources/d3body.html")
         else:
-            file = QFile("./Resources/d3.test.js")
-            file.open(QFile.ReadOnly | QFile.Text)
-            textStream = QTextStream(file)
-            d3Test = textStream.readAll()
-            file.close()
+            d3 = ReadTextFile("../ui/Resources/d3.min.js")
+            d3Test = ReadTextFile("../ui/Resources/d3.test.js")
+            body = ReadTextFile("../ui/Resources/d3body.html")
 
-            file = QFile("./Resources/d3body.html")
-            file.open(QFile.ReadOnly | QFile.Text)
-            textStream = QTextStream(file)
-            body = textStream.readAll()
-            file.close()
         #
         # set html frame content
         #

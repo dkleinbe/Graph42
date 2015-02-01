@@ -16,3 +16,13 @@ def ReadResourceTextFile(resFile):
     file.close()
 
     return data
+
+def ReadTextFile(filePath):
+
+    file = QFile(filePath)
+    file.open(QFile.ReadOnly | QFile.Text)
+    textStream = QTextStream(file)
+    data = textStream.readAll()
+    file.close()
+
+    return data

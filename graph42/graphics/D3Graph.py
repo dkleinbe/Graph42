@@ -52,6 +52,7 @@ class Js2PyBridge(QWidget):
     """Python interpreter version property."""
     pyVersion = QtCore.pyqtProperty(str, fget=_pyVersion)
 
+
 class D3Graph:
 
     __nodes = dict()
