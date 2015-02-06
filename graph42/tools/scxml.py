@@ -3,9 +3,11 @@ __author__ = 'T0005632'
 import logging
 
 try:
-    from PyQt5.QtCore import QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, QXmlStreamReader, QIODevice
+    from PyQt5.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
+        QXmlStreamReader, QIODevice, pyqtSignal, pyqtSlot
 except ImportError:
-    from PyQt4.QtCore import QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, QXmlStreamReader, QIODevice
+    from PyQt4.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
+        QXmlStreamReader, QIODevice
 
 logger = logging.getLogger("Graph42")  # __main__
 #logger.addHandler(logging.NullHandler())
@@ -15,6 +17,7 @@ class QScxml(QStateMachine):
     def __init__(self):
 
         super(QScxml, self).__init__()
+        self.knownEvents = set()
 
     @staticmethod
     def load(filename):
@@ -28,6 +31,12 @@ class QScxml(QStateMachine):
         logger.info("Loading file: <%s> ", filename)
         return l.load(file)
 
+    @pyqtSlot()
+    def handleStateFinished(self):
+
+        state = self.sender()
+        if state:
+            self.postEvent() # TODO send relevant event
 
 class QScxmlTransition(QAbstractTransition):
 
@@ -44,6 +53,25 @@ class QScxmlTransition(QAbstractTransition):
     def setEventPrefixes(self,ev):
         self.ev = ev
 
+    def eventPrefixes(self):
+        return self.ev
+
+
+class QScxmlScriptExec(QObject):
+
+    def __init__(self, src, scx):
+
+        super(QScxmlScriptExec, self).__init__()
+
+        self.src = src
+        self.scxml = scx
+
+    @pyqtSlot(str)
+    def exec(self):
+
+            self.scxml.executeScript(self.src)
+
+
 class ScExecContext:
 
     Unknown = 0
@@ -53,12 +81,24 @@ class ScExecContext:
 
     def __init__(self):
         self.type = self.Unknown
-        self.script = ""
+        self.script = str()
+        self.state =None
+        self.stateMachine = None
+
+    def applyScript(self):
+
+        exec = QScxmlScriptExec(self.script, self.stateMachine)
+        if len(self.script) != 0:
+
+            self.state.entered.connect(exec.exec)
+
+            pass
 
 class ScHistoryInfo:
     pass
 
-
+class ScTransitionInfo:
+    pass
 
 class ScxmlLoader:
 
@@ -68,18 +108,52 @@ class ScxmlLoader:
         self.stateInfo = dict()
         self.statesWithFinal = set()
         self.historyInfo = list()
+        self.stateByID = dict()
+        self.transitions = list()
+        self.signalEvents = list()
 
 
     def load(self, dev):
 
         self.stateMachine = QScxml()
+        #
+        # Traverse through the state
+        #
         self.loadState(dev, self.stateMachine)
+        #
+        # resolve history state
+        #
+        for h in self.historyInfo:
+            h.hstate.setDefaultState(self.stateByID[h.defaultStateID])
+        #
+        # TODO resolve signal events
+        #
+
+        #
+        # resolve finish states connection
+        #
+        for s in self.statesWithFinal:
+            s.finished.connect(self.stateMachine.handleStateFinished)
+        #
+        # resolve transitions
+        #
+        for t in self.transitions:
+            states = list()
+            if len(t.targets) != 0:
+                for s in t.targets:
+                    if len(s.strip()) != 0:
+                        st = self.stateByID[s]
+                        if st is not None:
+                            states.append(st)
+                t.transition.setTargetStates(states)
+
+        return self.stateMachine
 
 
     def loadState(self, dev, stateParam, stateID = ""):
 
-        stateByID = dict()
         curExecContext = ScExecContext()
+        curExecContext.stateMachine = self.stateMachine
         curHistoryState = None
 
         r = QXmlStreamReader(dev)
@@ -134,7 +208,7 @@ class ScxmlLoader:
                         # TODO implement src attribute management in state element
                         #
                         initialID = r.attributes().value("initial")
-                        stateByID[id] = newState
+                        self.stateByID[id] = newState
                         curState = newState
                         curExecContext.state = newState
                 #
@@ -153,7 +227,7 @@ class ScxmlLoader:
                         type = r.attributes().value("type")
                         type = QHistoryState.ShallowHistory if type == "shallow" else QHistoryState.DeepHistory
                         curHistoryState = QHistoryState(type)
-                        stateByID[id] = curHistoryState
+                        self.stateByID[id] = curHistoryState
                 #
                 # <final>
                 #
@@ -168,7 +242,7 @@ class ScxmlLoader:
                         if gp is not None:
                             if gp.childMode() == QState.ParallelStates:
                                 self.statesWithFinal.add()
-                        stateByID[id] = f
+                        self.stateByID[id] = f
                 #
                 # <script>
                 #
@@ -187,8 +261,11 @@ class ScxmlLoader:
                 # <log>
                 #
                 elif name == "log":
-                    # TODO Format log string
-                    curExecContext.script += "logger.info(...)"
+
+                    curExecContext.script += 'logger.info("[%s] [%s] %e",' \
+                                             + r.attributes().value("label") + \
+                                             r.attributes().value("level") + r.attributes().value("expr") + "\n"
+
                 #
                 # <assign>
                 #
@@ -251,20 +328,78 @@ class ScxmlLoader:
                         inf.defaultStateID = r.attributes().value("target")
                         self.historyInfo.append(inf)
                     else:
-                        inf = ScHistoryInfo()
-                        inf.targets = r.attributes().value("target") # TODO split targets
+                        inf = ScTransitionInfo()
+                        inf.targets = r.attributes().value("target").split() # TODO split targets
                         curExecContext.type = ScExecContext.Transition
                         curExecContext.script = ""
                         curTransition = QScxmlTransition(curState, self.stateMachine)
                         curTransition.setConditionExpression(r.attributes().value("cond"))
                         curTransition.setEventPrefixes(r.attributes().value("event").split(' '))
+                        for pfx in curTransition.eventPrefixes():
+                            if pfx is not "*":
+                                self.stateMachine.knownEvents.add(pfx)
+                        curExecContext.trans = curTransition
+                        inf.transition = curTransition
+                        self.transitions.append(inf)
+                        for pfx in curTransition.eventPrefixes():
+                            if pfx.startswith("q-signal:"):
+                                self.signalEvents.append(pfx)
+                        curTransition.setObjectName(curState.objectName()
+                                                    + " to "
+                                                    + ' '.join(curTransition.eventPrefixes()))
 
-
-
-
-
-
-
+            #
+            # End element
+            #
+            elif r.isEndElement():
+                name = r.name().lower()
+                #
+                # </state>
+                #
+                if name == "state":
+                    if curState == topLevelState:
+                        return
+                    else:
+                        curExecContext.state = curState
+                #
+                # </history>
+                #
+                elif name == "history":
+                    curHistoryState = None
+                #
+                # </final>
+                #
+                elif name == "final":
+                    curExecContext.state = curExecContext.state.parentState()
+                #
+                # </if>
+                #
+                elif name == "if":
+                    pass
+                #
+                # </send> </raise>
+                #
+                elif name == "send" or name == "raise":
+                    pass
+                #
+                # </onentry> </onexit> </scxml>
+                #
+                elif name == "onentry" or name == "onexit" or name == "scxml":
+                    curExecContext.state = curState
+                    curExecContext.type = ScExecContext.StateExit if name == "onexit" else ScExecContext.StateEntry
+                    curExecContext.applyScript();
+                    curExecContext.type = ScExecContext.Unknown
+                    curExecContext.script = ""
+                #
+                # </transition>
+                #
+                elif name == "transition":
+                    if curHistoryState is None:
+                        curExecContext.trans = curTransition
+                        curExecContext.type = ScExecContext.Transition
+                        curExecContext.applyScript()
+                        curExecContext.script = ""
+                    curExecContext.type = ScExecContext.Unknown
 
 
 
@@ -277,4 +412,5 @@ if __name__ == '__main__':
 
     scxml_machine = QScxml.load("ExifMediaRename.scxml", )
 
+    scxml_machine.start()
 
