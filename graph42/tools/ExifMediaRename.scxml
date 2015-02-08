@@ -467,6 +467,9 @@ w.storeCurrentSettings();</script>
 	</parallel>
 	<final id="EXIT"/>
 	<state id="INITIAL">
+		<onentry>
+			<log label="'decadix'" level="'INFO'" expr="' -&gt; Entering INITIAL'"/>
+		</onentry>
 		<transition target="ROOT" cond="w.init()"/>
 	</state>
 </scxml>
