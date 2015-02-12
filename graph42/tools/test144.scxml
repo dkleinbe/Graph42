@@ -13,7 +13,13 @@ foo occurs before bar, success, otherwise failure -->
     <raise event="bar"/>
     -->
   </onentry>
+  <transition event="q-signal:pb.clicked" target="s1" cond="" />
 
  </state>
 
+<state id="s1">
+  <onentry>
+    <log label="Initial" level="info" expr="Entering s1" />
+  </onentry>
+</state>
 </scxml>

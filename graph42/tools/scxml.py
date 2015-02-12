@@ -5,7 +5,7 @@ import sys
 
 try:
     from PyQt5.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
-        QXmlStreamReader, QIODevice, pyqtSignal, pyqtSlot
+        QSignalTransition, QXmlStreamReader, QIODevice, pyqtSignal, pyqtSlot
     from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
 except ImportError:
     from PyQt4.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
@@ -21,12 +21,12 @@ class QScxml(QStateMachine):
         super(QScxml, self).__init__()
         self.knownEvents = set()
         self.execContexts = list()
+        self.objects = {}
 
-    @staticmethod
-    def load(filename):
+#    @staticmethod
+    def load(self, filename):
 
-
-        l = ScxmlLoader()
+        l = ScxmlLoader(self)
         file = QFile(filename)
         if not file.open(QFile.ReadOnly):
             logger.error("Error while opening file: <%s>", filename)
@@ -44,6 +44,27 @@ class QScxml(QStateMachine):
         if state:
             pass
             # self.postEvent(QEvent()) # TODO send relevant event
+
+    def registerObject(self, obj, name):
+
+        self.objects[name] = obj
+
+
+class QScxmlSignalTransition(QSignalTransition):
+
+    def __init__(self, signal, sourceState=None):
+
+        super(QSignalTransition, self).__init__(signal, sourceState)
+
+    def setConditionExpression(self, cond):
+        self.prog = cond
+
+    def eventTest(self, QEvent):
+        return True
+
+    def onTransition(self, QEvent):
+        pass
+
 
 class QScxmlTransition(QAbstractTransition):
 
@@ -123,20 +144,19 @@ class ScTransitionInfo:
 
 class ScxmlLoader:
 
-    def __init__(self):
+    def __init__(self, sm):
 
-        self.stateMachine = None
+        self.stateMachine = sm
         self.stateInfo = dict()
         self.statesWithFinal = set()
         self.historyInfo = list()
         self.stateByID = dict()
-        self.transitions = list()
+        self.transitionsInf = list()
         self.signalEvents = list()
 
 
     def load(self, dev):
 
-        self.stateMachine = QScxml()
         self.stateMachine.setObjectName("scxml")
         #
         # Traverse through the state
@@ -159,15 +179,19 @@ class ScxmlLoader:
         #
         # resolve transitions
         #
-        for t in self.transitions:
+        for ti in self.transitionsInf:
             states = list()
-            if len(t.targets) != 0:
-                for s in t.targets:
+            if len(ti.targets) != 0:
+                # for all targets find associated state
+                for s in ti.targets:
                     if len(s.strip()) != 0:
                         st = self.stateByID[s]
                         if st is not None:
                             states.append(st)
-                t.transition.setTargetStates(states)
+                # for all transition set target state
+                for t in ti.transitions:
+                    t.setTargetStates(states)
+
 
         return self.stateMachine
 
@@ -362,21 +386,33 @@ class ScxmlLoader:
                         inf.targets = r.attributes().value("target").split() # TODO split targets
                         curExecContext.type = ScExecContext.Transition
                         curExecContext.script = ""
-                        curTransition = QScxmlTransition(curState, self.stateMachine)
-                        curTransition.setConditionExpression(r.attributes().value("cond"))
-                        curTransition.setEventPrefixes(r.attributes().value("event").split(' '))
-                        for pfx in curTransition.eventPrefixes():
-                            if pfx is not "*":
-                                self.stateMachine.knownEvents.add(pfx)
-                        curExecContext.trans = curTransition
-                        inf.transition = curTransition
-                        self.transitions.append(inf)
-                        for pfx in curTransition.eventPrefixes():
+                        #curTransition = QScxmlTransition(curState, self.stateMachine)
+                        #curTransition.setConditionExpression(r.attributes().value("cond"))
+                        #curTransition.setEventPrefixes(r.attributes().value("event").split(' '))
+                        #for pfx in curTransition.eventPrefixes():
+                        #    if pfx is not "*":
+                        #        self.stateMachine.knownEvents.add(pfx)
+                        #curExecContext.trans = curTransition
+                        inf.transitions = list()
+                        self.transitionsInf.append(inf)
+                        for pfx in r.attributes().value("event").split(' '):
                             if pfx.startswith("q-signal:"):
                                 self.signalEvents.append(pfx)
-                        curTransition.setObjectName(curState.objectName()
-                                                    + " to "
-                                                    + ' '.join(curTransition.eventPrefixes()))
+
+                                objName = pfx[pfx.index(':')+1:pfx.rindex('.')]  # get object name (a.b.c)
+                                sigName = pfx[pfx.rindex('.')+1:]  # get signal name
+                                # create Signal transition
+                                # TODO create QScxmlSignalTransition with cond
+                                sz = "QSignalTransition(" + objName + "." + sigName + ")"
+                                sigTransition = eval(sz, globals(), self.stateMachine.objects)
+                                # add transition to current state
+                                curState.addTransition(sigTransition)
+                                inf.transitions.append(sigTransition)
+
+
+                        #curTransition.setObjectName(curState.objectName()
+                        #                            + " to "
+                        #                            + ' '.join(curTransition.eventPrefixes()))
 
             #
             # End element
@@ -426,7 +462,7 @@ class ScxmlLoader:
                 #
                 elif name == "transition":
                     if curHistoryState is None:
-                        curExecContext.trans = curTransition
+                        #curExecContext.trans = curTransition
                         curExecContext.type = ScExecContext.Transition
                         curExecContext.applyScript()
                         curExecContext.script = ""
@@ -440,9 +476,6 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG,
                         format='{asctime:<20}|{levelname:.<8}|{name:}|{filename}:{lineno}| {message}',
                         style='{')
-    scxml_machine = QScxml()
-
-    scxml_machine = QScxml.load("test144.scxml", )
 
 
 
@@ -452,16 +485,34 @@ if __name__ == '__main__':
     window = QMainWindow()
 
     pb = QPushButton(window)
+    pb.setText("Press me")
     window.show()
     window.raise_()
 
+    tr = QScxmlSignalTransition(pb.clicked)
+
+    scxml_machine = QScxml()
+    scxml_machine.registerObject(pb, "pb")
+    scxml_machine.load("test144.scxml")
+    #scxml_machine = QScxml.load("ExifMediaRename.scxml", )
+
     scxml_machine.start()
+
+
 
     if 0:
         sm = QStateMachine()
         s1 = QState()
-        s1.entered.connect(toto)
+
+        s2 = QState()
+        s2.entered.connect(toto)
+
+        st = QSignalTransition(pb.clicked)
+        st.setTargetState(s2)
+
+        s1.addTransition(st)
         sm.addState(s1)
+        sm.addState(s2)
         sm.setInitialState(s1)
         sm.start()
 
