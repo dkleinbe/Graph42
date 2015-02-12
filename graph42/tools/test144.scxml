@@ -1,25 +1,31 @@
-<?xml version="1.0" encoding="UTF-8"?><!-- test that events are inserted into the queue in the order in which they are raised.  If
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- test that events are inserted into the queue in the order in which they are raised.  If
 foo occurs before bar, success, otherwise failure -->
 <scxml xmlns="http://www.w3.org/2005/07/scxml"
        xmlns:conf="http://www.w3.org/2005/scxml-conformance"
        initial="s0" datamodel="python">
 
-  
-<state id="s0">
-  <onentry>
-    <log label="Initial" level="info" expr="Entering s0" />
-    <!--
-    <raise event="foo"/>
-    <raise event="bar"/>
-    -->
-  </onentry>
-  <transition event="q-signal:pb.clicked" target="s1" cond="" />
+    <state id="s0">
+        <onentry>
+            <log label="scxml" level="info" expr="&gt; Entering s0" />
+            <!--
+            <raise event="foo"/>
+            <raise event="bar"/>
+            -->
+        </onentry>
+        <transition event="q-signal:pb.clicked" target="s1" cond="" />
+        <onexit>
+            <log label="scxml" level="info" expr="&lt; Exiting s0" />
+        </onexit>
 
- </state>
+    </state>
 
-<state id="s1">
-  <onentry>
-    <log label="Initial" level="info" expr="Entering s1" />
-  </onentry>
-</state>
+    <state id="s1">
+        <onentry>
+            <log label="scxml" level="error" expr="Entering s1" />
+        </onentry>
+        <transition event="q-signal:pb.clicked" target="s0" cond="" >
+            <log label="scxml" level="info" expr="= Transitioning to s0" />
+        </transition>
+    </state>
 </scxml>
