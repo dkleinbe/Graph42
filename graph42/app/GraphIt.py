@@ -15,6 +15,7 @@ except ImportError:
 from graph42.tools.log.logstream import TextEditHtmlHandler
 from graph42.tools.log.htmlcolorlog import HtmlColoredFormatter
 from graph42.tools.myutils import ReadResourceTextFile, ReadTextFile
+from graph42.tools.scxml import QScxml
 
 from graph42.ui.flowlayout import FlowLayout
 from graph42.graphics.D3Graph import D3Graph, Js2PyBridge
@@ -101,6 +102,13 @@ class MainWindow(QMainWindow):
 
         self.js2py = Js2PyBridge()
         self.ui.webViewGraph.page().mainFrame().addToJavaScriptWindowObject('js2py', self.js2py)
+        #
+        # Init state machine
+        #
+        self.state_machine = QScxml()
+        self.state_machine.registerObject(self.ui, "ui")
+        self.state_machine.load("../ui/Resources/Graph42.scxml")
+        self.state_machine.start()
 
     def Neo4jConnect(self):
 

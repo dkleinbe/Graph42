@@ -27,5 +27,20 @@ foo occurs before bar, success, otherwise failure -->
         <transition event="q-signal:pb.clicked" target="s0" cond="" >
             <log label="scxml" level="info" expr="= Transitioning to s0" />
         </transition>
+        <transition event="q-signal:cb.stateChanged" target="s3" cond="cb.isChecked() == True" >
+            <log label="scxml" level="info" expr="= Transitioning to s3" />
+        </transition>
+    </state>
+
+    <state id="s3">
+        <transition event="q-signal:pb.clicked" target="s0" cond="" >
+            <log label="scxml" level="info" expr="= Transitioning to s0" />
+        </transition>
+        <transition event="q-signal:cb.stateChanged" target="s1" cond="cb.isChecked() == True" >
+            <log label="scxml" level="info" expr="= Transitioning to s1" />
+        </transition>
+        <transition event="q-signal:cb.stateChanged" target="s3" cond="cb.isChecked() == False" >
+            <log label="scxml" level="info" expr="= Transitioning to s3" />
+        </transition>
     </state>
 </scxml>

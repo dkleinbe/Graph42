@@ -6,7 +6,7 @@ import sys
 try:
     from PyQt5.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
         QSignalTransition, QXmlStreamReader, QIODevice, pyqtSignal, pyqtSlot
-    from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton
+    from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QCheckBox,  QGridLayout, QWidget
 except ImportError:
     from PyQt4.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
         QXmlStreamReader, QIODevice
@@ -21,7 +21,7 @@ class QScxml(QStateMachine):
         super(QScxml, self).__init__()
         self.knownEvents = set()
         self.execContexts = list()
-        self.objects = {}
+        self.registeredObjects = {"stateMachine": self}  # register state machine in the exec context
 
 #    @staticmethod
     def load(self, filename):
@@ -47,47 +47,55 @@ class QScxml(QStateMachine):
 
     def registerObject(self, obj, name):
 
-        self.objects[name] = obj
+        self.registeredObjects[name] = obj
 
 
 class QScxmlSignalTransition(QSignalTransition):
 
-    def __init__(self, signal, sourceState=None):
+    def __init__(self, signal, machine, sourceState=None):
 
         super(QScxmlSignalTransition, self).__init__(signal, sourceState)
         self.condition = ""
+
+        self.scxml = machine
 
     def setConditionExpression(self, cond):
         self.condition = cond
 
     def eventTest(self, QEvent):
-        return super(QScxmlSignalTransition, self).eventTest(QEvent)
-        #return True
+        if super(QScxmlSignalTransition, self).eventTest(QEvent) is not True:
+            return False
+        else:
+            if self.condition == "":
+                return True
+            else:
+                # eval transition condition
+                return eval(self.condition, self.scxml.registeredObjects)
 
     #def onTransition(self, QEvent):
     #    pass
 
 
-class QScxmlTransition(QAbstractTransition):
+class QScxmlEventlessTransition(QAbstractTransition):
 
-    def __init__(self, state, machine):
+    def __init__(self, machine, sourceState=None):
 
-        super(QAbstractTransition, self).__init__(state)
+        super(QScxmlEventlessTransition, self).__init__(sourceState)
 
         self.scxml = machine
-        self.prog = ""
+        self.condition = ""
 
     def setConditionExpression(self, cond):
-        self.prog = cond
 
-    def setEventPrefixes(self,ev):
-        self.ev = ev
-
-    def eventPrefixes(self):
-        return self.ev
+        self.condition = cond
 
     def eventTest(self, QEvent):
-        return True
+
+        if self.condition == "":
+            return True
+        else:
+            # eval transition condition
+            return eval(self.condition, self.scxml.registeredObjects)
 
     def onTransition(self, QEvent):
         pass
@@ -408,8 +416,17 @@ class ScxmlLoader:
                         curTransitions = list()
                         inf.transitions = list()
                         self.transitionsInf.append(inf)
+                        events = r.attributes().value("event").split(' ')
+
                         for pfx in r.attributes().value("event").split(' '):
-                            if pfx.startswith("q-signal:"):
+                            sigTransition = None
+                            if pfx == '':
+
+                                # For eventless transition create QScxmlEventlessTransition transition
+
+                                sigTransition = QScxmlEventlessTransition(self.stateMachine)
+
+                            elif pfx.startswith("q-signal:"):
 
                                 # For all q-signal event, add a QSxcmlSignalTransition
 
@@ -420,8 +437,11 @@ class ScxmlLoader:
 
                                 # create Signal transition
 
-                                sz = "QScxmlSignalTransition(" + objName + "." + sigName + ")"
-                                sigTransition = eval(sz, globals(), self.stateMachine.objects)
+                                sz = "QScxmlSignalTransition(" + objName + "." + sigName + ", stateMachine)"
+
+                                sigTransition = eval(sz, globals(), self.stateMachine.registeredObjects)
+
+                            if sigTransition is not None:
 
                                 # add condition to transition
 
@@ -438,12 +458,8 @@ class ScxmlLoader:
                                 # append sigTransition to curTransitions list
 
                                 curTransitions.append(sigTransition)
-
-
-                        #curTransition.setObjectName(curState.objectName()
-                        #                            + " to "
-                        #                            + ' '.join(curTransition.eventPrefixes()))
-
+                            else:
+                                logger.error("Transition creation error")
             #
             # End element
             #
@@ -513,9 +529,20 @@ if __name__ == '__main__':
     logger.info("Application running")
 
     window = QMainWindow()
+    central = QWidget(window)
+    window.setCentralWidget(central)
+    lo = QGridLayout(central)
 
-    pb = QPushButton(window)
+
+    pb = QPushButton()
     pb.setText("Press me")
+
+    cb = QCheckBox()
+    cb.setText("Check me")
+
+    lo.addWidget(pb,0,0)
+    lo.addWidget(cb,0,1)
+
     window.show()
     window.raise_()
 
@@ -523,6 +550,7 @@ if __name__ == '__main__':
 
     scxml_machine = QScxml()
     scxml_machine.registerObject(pb, "pb")
+    scxml_machine.registerObject(cb, "cb")
     scxml_machine.load("test144.scxml")
     #scxml_machine = QScxml.load("ExifMediaRename.scxml", )
 
