@@ -120,7 +120,7 @@ function tick() {
 function nodeselected()
 {
     js2py.node_selected(d3.select(this).node().__data__.index);
-    js2py.send_event({type: "node_selected", node_id: d3.select(this).node().__data__.index })
+    js2py.send_event({type: "node_selected", node_id: d3.select(this).node().__data__.name })
 }
 
 function restart() {

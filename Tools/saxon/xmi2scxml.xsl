@@ -129,10 +129,10 @@
 							Add entry and exit log messages
 							-->
               <onentry>
-                <log label="'decadix'" level="'INFO'" expr="' -&gt; Entering {$id}'" />
+                <log label="'decadix'" level="info" expr="' -&gt; Entering {$id}'" />
               </onentry>
               <onexit>
-                <log label="'decadix'" level="'INFO'" expr="' &lt;- Exiting {$id}'" />
+                <log label="'decadix'" level="info" expr="' &lt;- Exiting {$id}'" />
               </onexit>
               <xsl:apply-templates select="../transition[@source=$xmiid]"/>
               <xsl:apply-templates select="region"/>
@@ -144,10 +144,10 @@
 							Add entry and exit log messages
 							-->
               <onentry>
-                <log label="'decadix'" level="'INFO'" expr="' -&gt; Entering {$id}'" />
+                <log label="'decadix'" level="info" expr="' -&gt; Entering {$id}'" />
               </onentry>
               <onexit>
-                <log label="'decadix'" level="'INFO'" expr="' &lt;- Exiting {$id}'" />
+                <log label="'decadix'" level="info" expr="' &lt;- Exiting {$id}'" />
               </onexit>
               <xsl:apply-templates select="../transition[@source=$xmiid]"/>
               <xsl:apply-templates select="region"/>
@@ -237,7 +237,7 @@
       </xsl:when>
       <xsl:otherwise>
         <transition event="{$name}" target="{$tname}" cond="{$cond}">
-          <log label="'decadix'" level="'INFO'" expr="' == {$source} &lt;{@name}&gt; {$tname}'" />
+          <log label="'decadix'" level="info" expr="' == {$source} &lt;{@name}&gt; {$tname}'" />
           <xsl:apply-templates />
         </transition>
       </xsl:otherwise>

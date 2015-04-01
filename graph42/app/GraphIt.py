@@ -27,6 +27,7 @@ from graph42.app.GraphDatabase import GraphDatabase,GraphNode, GraphRelation
 
 logger = logging.getLogger("Graph42") # __name__
 
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -78,7 +79,7 @@ class MainWindow(QMainWindow):
         #
         # Establish Qt connections
         #
-        self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
+        #self.ui.actionConnect.triggered.connect(self.Neo4jConnect)
 
         #
         # Read resource files
@@ -107,6 +108,7 @@ class MainWindow(QMainWindow):
         #
         self.state_machine = QScxml()
         self.state_machine.registerObject(self.ui, "ui")
+        self.state_machine.registerObject(self, "g42")
         self.state_machine.load("../ui/Resources/Graph42.scxml")
         self.state_machine.start()
 
@@ -115,7 +117,11 @@ class MainWindow(QMainWindow):
         self.graphDB = GraphDatabase()
 
         logger.info("Connecting to database")
-        self.graphDB.connect()
+        try:
+            self.graphDB.connect()
+        except:
+            return False
+
         #
         # Add label buttons
         #
@@ -127,44 +133,45 @@ class MainWindow(QMainWindow):
         for rel in self.graphDB.relationship_types():
             self.relTypesFlowLayout.addWidget(QPushButton(rel))
 
-        node = self.graphDB.node(1)
-        logger.info("node: %s", node)
-        logger.info("node degree: %s", node.degree())
+        if 0:
+            node = self.graphDB.node(1)
+            logger.info("node: %s", node)
+            logger.info("node degree: %s", node.degree())
 
-        props = node.properties()
+            props = node.properties()
 
-        for propName, propValue in props.items():
-            logger.info("prop : %s %s", propName, propValue )
-        for rel in node.relationships():
-            labels = rel.end_node().labels()
-            for label in labels:
-                logger.info("labels : %s", label)
-            logger.info("relation: %s <-%s-> %s %s",
-                        rel.start_node().property("name"),
-                        rel.type(),
-                        label,
-                        rel.end_node().property("title"))
+            for propName, propValue in props.items():
+                logger.info("prop : %s %s", propName, propValue )
+            for rel in node.relationships():
+                labels = rel.end_node().labels()
+                for label in labels:
+                    logger.info("labels : %s", label)
+                logger.info("relation: %s <-%s-> %s %s",
+                            rel.start_node().property("name"),
+                            rel.type(),
+                            label,
+                            rel.end_node().property("title"))
 
         self.GraphTest()
 
+        return True
 
     def GraphTest(self):
 
         logger.info("TestGraph begin")
 
-        rec_list = self.graphDB.execute_cypher("MATCH (n:`Movie`) RETURN n LIMIT 25")
-        print(rec_list)
-
-        n1 = self.graphDB.node(1)
-        n2 = self.graphDB.node(2)
-        n3 = GraphNode()
+        #rec_list = self.graphDB.execute_cypher("MATCH (n:`Movie`) RETURN n LIMIT 25")
+        rec_list = self.graphDB.execute_cypher("MATCH (a)-[r]-(b) RETURN a,r,b LIMIT 20")
 
         d3graph = D3Graph(self.ui.webViewGraph.page().mainFrame())
 
-        d3graph.add_node(n1)
-        for rel in n1.relationships():
-            d3graph.add_node(rel.end_node())
-            d3graph.add_link(n1, rel.end_node(), rel.type())
+        sub_graph = rec_list.to_subgraph()
+        for node in sub_graph.nodes:
+            gnode = GraphNode(node)
+            d3graph.add_node(gnode)
+        for rel in sub_graph.relationships:
+            grel = GraphRelation(rel)
+            d3graph.add_link(grel.start_node(), grel.end_node(), grel.type())
 
         d3graph.restart()
 

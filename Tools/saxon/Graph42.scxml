@@ -14,14 +14,35 @@
    <state id="INITIAL">
       <transition target="ROOT" cond=""/>
    </state>
-   <state id="ROOT">
+   <state id="ROOT" initial="ROOT_INIT">
       <onentry>
-         <log label="'decadix'" level="'INFO'" expr="' -&gt; Entering ROOT'"/>
+         <log label="'decadix'" level="info" expr="' -&gt; Entering ROOT'"/>
       </onentry>
       <onexit>
-         <log label="'decadix'" level="'INFO'" expr="' &lt;- Exiting ROOT'"/>
+         <log label="'decadix'" level="info" expr="' &lt;- Exiting ROOT'"/>
       </onexit>
-      <transition target="FINAL" cond=""/>
+      <transition event="q-signal:ui.actionExit.triggered" target="FINAL" cond="">
+         <log label="'decadix'"
+              level="info"
+              expr="' == ROOT &lt;q-signal:ui.actionExit.triggered&gt; FINAL'"/>
+      </transition>
+      <state id="ROOT_INIT">
+         <transition event="q-signal:ui.actionConnect.triggered"
+                     target="CONNECTING"
+                     cond="">
+            <log label="'decadix'"
+                 level="info"
+                 expr="' == ROOT_INIT &lt;q-signal:ui.actionConnect.triggered&gt; CONNECTING'"/>
+         </transition>
+      </state>
+      <state id="CONNECTING">
+         <onentry>
+            <log label="'decadix'" level="info" expr="' -&gt; Entering CONNECTING'"/>
+         </onentry>
+         <onexit>
+            <log label="'decadix'" level="info" expr="' &lt;- Exiting CONNECTING'"/>
+         </onexit>
+      </state>
    </state>
    <final id="FINAL"/>
 </scxml>

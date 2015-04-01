@@ -15,12 +15,17 @@ class GraphDatabase:
         pass
 
     def connect(self):
+
+        db = "http://localhost:7474/db/data/"
+        self.graph_db = neo4j.Graph(db)
         try:
-            db = "http://localhost:7474/db/data/"
-            self.graph_db = neo4j.Graph(db)
-            logger.info('neo4j version: %s', self.graph_db.neo4j_version)
+            ver = self.graph_db.neo4j_version
         except :
             logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1].__class__.__name__)
+            raise
+        else:
+            logger.info('neo4j version: %s', ver)
+
 
     def node_labels_set(self):
         """
@@ -101,6 +106,13 @@ class GraphNode:
             i_rel = GraphRelation(rel)
             yield i_rel
 
+    def outgoing_relationships(self):
+        """
+        :return: node's outgoing relationships iterator
+        """
+        for rel in self.node.match_outgoing():
+            i_rel = GraphRelation(rel)
+            yield i_rel
 
 class GraphRelation:
 

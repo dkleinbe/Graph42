@@ -112,7 +112,7 @@ class QScxmlScriptExec(QObject):
 
     @pyqtSlot()
     def exec(self):
-        exec(self.src)
+        exec(self.src, globals(), self.scxml.registeredObjects)
         #self.scxml.executeScript(self.src)
 
 
@@ -407,16 +407,10 @@ class ScxmlLoader:
                             curExecContext.script = 'logger.debug("[scxml] [debug] = Transitioning to: [' \
                                                     + ', '.join(inf.targets) + ']")' + '\n'
 
-                        #curTransition.setEventPrefixes(r.attributes().value("event").split(' '))
-                        #for pfx in curTransition.eventPrefixes():
-                        #    if pfx is not "*":
-                        #        self.stateMachine.knownEvents.add(pfx)
-                        #curExecContext.trans = curTransition
 
                         curTransitions = list()
                         inf.transitions = list()
                         self.transitionsInf.append(inf)
-                        events = r.attributes().value("event").split(' ')
 
                         for pfx in r.attributes().value("event").split(' '):
                             sigTransition = None
@@ -432,14 +426,23 @@ class ScxmlLoader:
 
                                 self.signalEvents.append(pfx)
 
-                                objName = pfx[pfx.index(':')+1:pfx.rindex('.')]  # get object name (a.b.c)
-                                sigName = pfx[pfx.rindex('.')+1:]  # get signal name
+                                # get object name (a.b.c) => a
+
+                                objName = pfx[pfx.index(':')+1:pfx.index('.')]
+
+                                # get object reference
+
+                                obj = self.stateMachine.registeredObjects[objName]
+
+                                # get signal reference
+
+                                for attr in pfx[pfx.index('.')+1:].split('.'):
+                                    sig = getattr(obj, attr)
+                                    obj = sig
 
                                 # create Signal transition
 
-                                sz = "QScxmlSignalTransition(" + objName + "." + sigName + ", stateMachine)"
-
-                                sigTransition = eval(sz, globals(), self.stateMachine.registeredObjects)
+                                sigTransition = QScxmlSignalTransition(sig, self.stateMachine)
 
                             if sigTransition is not None:
 
@@ -458,6 +461,7 @@ class ScxmlLoader:
                                 # append sigTransition to curTransitions list
 
                                 curTransitions.append(sigTransition)
+
                             else:
                                 logger.error("Transition creation error")
             #

@@ -1,46 +1,36 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- test that events are inserted into the queue in the order in which they are raised.  If
-foo occurs before bar, success, otherwise failure -->
-<scxml xmlns="http://www.w3.org/2005/07/scxml"
-       xmlns:conf="http://www.w3.org/2005/scxml-conformance"
-       initial="s0" datamodel="python">
-
-    <state id="s0">
-        <onentry>
-            <log label="scxml" level="info" expr="&gt; Entering s0" />
-            <!--
+<scxml initial="s0" version="0.9" xmlns="http://www.w3.org/2005/07/scxml" xmlns:conf="http://www.w3.org/2005/scxml-conformance"><!--   node-size-and-position x=0 y=0 w=450 h=610  -->
+ <state id="s0"><!--   node-size-and-position x=230 y=50 w=75 h=75  -->
+  <onentry>
+   <log expr="&gt; Entering s0" label="scxml" level="info"></log>
+<!-- 
             <raise event="foo"/>
             <raise event="bar"/>
-            -->
-        </onentry>
-        <transition event="q-signal:pb.clicked" target="s1" cond="" />
-        <onexit>
-            <log label="scxml" level="info" expr="&lt; Exiting s0" />
-        </onexit>
-
-    </state>
-
-    <state id="s1">
-        <onentry>
-            <log label="scxml" level="error" expr="Entering s1" />
-        </onentry>
-        <transition event="q-signal:pb.clicked" target="s0" cond="" >
-            <log label="scxml" level="info" expr="= Transitioning to s0" />
-        </transition>
-        <transition event="q-signal:cb.stateChanged" target="s3" cond="cb.isChecked() == True" >
-            <log label="scxml" level="info" expr="= Transitioning to s3" />
-        </transition>
-    </state>
-
-    <state id="s3">
-        <transition event="q-signal:pb.clicked" target="s0" cond="" >
-            <log label="scxml" level="info" expr="= Transitioning to s0" />
-        </transition>
-        <transition event="q-signal:cb.stateChanged" target="s1" cond="cb.isChecked() == True" >
-            <log label="scxml" level="info" expr="= Transitioning to s1" />
-        </transition>
-        <transition event="q-signal:cb.stateChanged" target="s3" cond="cb.isChecked() == False" >
-            <log label="scxml" level="info" expr="= Transitioning to s3" />
-        </transition>
-    </state>
+             --></onentry>
+  <onexit>
+   <log expr="&lt; Exiting s0" label="scxml" level="info"></log>
+  </onexit>
+  <transition event="q-signal:pb.clicked" target="s1"><!--   edge-path [s1]  x=280 y=170 pointx=0 pointy=56 offsetx=11 offsety=-7  --></transition>
+ </state>
+ <state id="s1"><!--   node-size-and-position x=200 y=210 w=75 h=75  -->
+  <onentry>
+   <log expr="Entering s1" label="scxml" level="error"></log>
+  </onentry>
+  <transition event="q-signal:pb.clicked" target="s0">
+   <log expr="= Transitioning to s0" label="scxml" level="info"></log>
+<!--   edge-path [s0]  x=160 y=160 pointx=0 pointy=2 offsetx=-26 offsety=-13  --></transition>
+  <transition cond="cb.isChecked() == True" event="q-signal:cb.stateChanged" target="s3">
+   <log expr="= Transitioning to s3" label="scxml" level="info"></log>
+<!--   edge-path [s3]  x=270 y=320  --></transition>
+ </state>
+ <state id="s3"><!--   node-size-and-position x=150 y=420 w=75 h=75  -->
+  <transition event="q-signal:pb.clicked" target="s0">
+   <log expr="= Transitioning to s0" label="scxml" level="info"></log>
+<!--   edge-path [s0]  x=390 y=270 pointx=0 pointy=0 offsetx=32 offsety=0  --></transition>
+  <transition cond="cb.isChecked() == True" event="q-signal:cb.stateChanged" target="s1">
+   <log expr="= Transitioning to s1" label="scxml" level="info"></log>
+<!--   edge-path [s1]  x=130 y=340  --></transition>
+  <transition cond="cb.isChecked() == False" event="q-signal:cb.stateChanged" target="s3">
+   <log expr="= Transitioning to s3" label="scxml" level="info"></log>
+<!--   edge-path [s3]  pointx=0 pointy=55 offsetx=0 offsety=3  --></transition>
+ </state>
 </scxml>
