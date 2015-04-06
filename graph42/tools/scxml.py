@@ -62,8 +62,8 @@ class QScxmlSignalTransition(QSignalTransition):
     def setConditionExpression(self, cond):
         self.condition = cond
 
-    def eventTest(self, QEvent):
-        if super(QScxmlSignalTransition, self).eventTest(QEvent) is not True:
+    def eventTest(self, qevent):
+        if super(QScxmlSignalTransition, self).eventTest(qevent) is not True:
             return False
         else:
             if self.condition == "":

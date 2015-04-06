@@ -103,6 +103,7 @@ class MainWindow(QMainWindow):
 
         self.js2py = Js2PyBridge()
         self.ui.webViewGraph.page().mainFrame().addToJavaScriptWindowObject('js2py', self.js2py)
+        self.js2py.register_event_handler('node_selected', self.node_selected)
         #
         # Init state machine
         #
@@ -111,6 +112,10 @@ class MainWindow(QMainWindow):
         self.state_machine.registerObject(self, "g42")
         self.state_machine.load("../ui/Resources/Graph42.scxml")
         self.state_machine.start()
+
+    def node_selected(self, evt):
+
+        logger.info("node selected: [%s]", evt['node_id'])
 
     def Neo4jConnect(self):
 

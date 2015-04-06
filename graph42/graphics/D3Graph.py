@@ -19,6 +19,11 @@ logger.addHandler(logging.NullHandler())
 class Js2PyBridge(QWidget):
     """ A class to bridge Javascript world and PyQt world
     """
+    def __init__(self):
+
+        super(Js2PyBridge, self).__init__()
+        self.__events = dict()
+
     @pyqtSlot(str)
     def showMessage(self, msg):
         """Open a message box and display the specified message."""
@@ -31,9 +36,16 @@ class Js2PyBridge(QWidget):
 
     @pyqtSlot(QVariant)
     def send_event(self, evt):
-        msgBox = QMessageBox()
-        msgBox.setText(str(evt['type']) + ": " + str(int(evt['node_id'])))
-        ret = msgBox.exec();
+
+        ev_type = str(evt['type'])
+        if ev_type not in self.__events:
+            return
+
+        self.__events[ev_type](evt)
+
+        #msgBox = QMessageBox()
+        #msgBox.setText(str(evt['type']) + ": " + str(int(evt['node_id'])))
+        #ret = msgBox.exec()
 
     @pyqtSlot(int)
     def node_selected(self, d3_id):
@@ -44,6 +56,10 @@ class Js2PyBridge(QWidget):
         msgBox = QMessageBox()
         msgBox.setText(str(d3_id))
         ret = msgBox.exec();
+
+    def register_event_handler(self, type, handler):
+
+        self.__events[type] = handler
 
     def _pyVersion(self):
         """Return the Python version."""
