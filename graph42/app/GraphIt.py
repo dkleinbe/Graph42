@@ -127,6 +127,9 @@ class MainWindow(QMainWindow):
         except:
             return False
 
+        return True
+
+    def InitGraphGui(self):
         #
         # Add label buttons
         #
