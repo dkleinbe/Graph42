@@ -9,7 +9,7 @@ try:
     from PyQt5.QtWidgets import QApplication, QMainWindow, QPushButton, QCheckBox,  QGridLayout, QWidget
 except ImportError:
     from PyQt4.QtCore import QObject, QFile, QStateMachine, QState, QHistoryState, QFinalState, QAbstractTransition, \
-        QXmlStreamReader, QIODevice
+        QSignalTransition, QXmlStreamReader, QIODevice, pyqtSignal, pyqtSlot
 
 logger = logging.getLogger("Graph42")  # __main__
 #logger.addHandler(logging.NullHandler())

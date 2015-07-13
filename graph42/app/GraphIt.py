@@ -3,7 +3,7 @@ __author__ = 'T0005632'
 import logging
 import sys
 
-
+#from PyQt5.QtCore import *
 try:
     from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton
     from PyQt5.QtCore import QFile, QObject, pyqtSignal, QUrl, QResource, QTextStream
