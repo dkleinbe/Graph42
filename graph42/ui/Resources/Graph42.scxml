@@ -1,16 +1,26 @@
-<scxml initial="INITIAL" version="0.9" xmlns="http://www.w3.org/2005/07/scxml" xmlns:scxml="http://www.w3.org/2005/07/scxml" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1"><!--   node-size-and-position x=0 y=0 w=304 h=576  -->
- <state id="INITIAL"><!--   node-size-and-position x=114,5 y=43 w=75 h=75  -->
+<scxml initial="INITIAL" version="0.9" xmlns="http://www.w3.org/2005/07/scxml" xmlns:scxml="http://www.w3.org/2005/07/scxml" xmlns:uml="http://www.eclipse.org/uml2/3.0.0/UML" xmlns:xmi="http://schema.omg.org/spec/XMI/2.1"><!--   node-size-and-position x=0 y=0 w=470 h=700  -->
+ <state id="INITIAL"><!--   node-size-and-position x=160 y=50 w=75 h=75  --><!-- node-size-and-position x=114,5 y=43 w=75 h=75   node-size-and-position x=114,5 y=43 w=75 h=75   node-size-and-position x=114,5 y=43 w=75 h=75   node-size-and-position x=114,5 y=43 w=75 h=75   node-size-and-position x=114,5 y=43 w=75 h=75   node-size-and-position x=114,5 y=43 w=75 h=75 -->
   <transition target="ROOT"></transition>
  </state>
- <state id="ROOT" initial="ROOT_INIT"><!--   node-size-and-position x=20 y=168 w=264 h=263  -->
+ <state id="ROOT" initial="ROOT_INIT"><!--   node-size-and-position x=20 y=170 w=400 h=390  -->
   <transition event="q-signal:ui.actionExit.triggered" target="FINAL">
    <log expr="&#039; == ROOT &lt;q-signal:ui.actionExit.triggered&gt; FINAL&#039;" label="&#039;decadix&#039;" level="info"></log>
   </transition>
-  <state id="ROOT_INIT"><!--   node-size-and-position x=94,11 y=43 w=75 h=75  --><!-- node-size-and-position x=94,11 y=43 w=75 h=75 -->
+  <state id="ROOT_INIT"><!--   node-size-and-position x=30 y=62 w=75 h=75  --><!-- node-size-and-position x=94,11 y=43 w=75 h=75   node-size-and-position x=94,11 y=43 w=75 h=75   node-size-and-position x=94,11 y=43 w=75 h=75   node-size-and-position x=94,11 y=43 w=75 h=75   node-size-and-position x=94,11 y=43 w=75 h=75   node-size-and-position x=94,11 y=43 w=75 h=75   node-size-and-position x=94,11 y=43 w=75 h=75 -->
    <transition cond="g42.Neo4jConnect()" event="q-signal:ui.actionConnect.triggered" target="CONNECTED"></transition>
   </state>
-  <state id="CONNECTED"><!--   node-size-and-position x=94,11 y=168 w=75 h=75  --></state>
+  <state id="CONNECTED"><!--   node-size-and-position x=120 y=182 w=75 h=75  -->
+   <onentry>
+    <script>
+
+g42.InitGraphGui()
+    </script>
+   </onentry>
+<!-- node-size-and-position x=94,11 y=168 w=75 h=75   node-size-and-position x=94,11 y=168 w=75 h=75   node-size-and-position x=94,11 y=168 w=75 h=75   node-size-and-position x=94,11 y=168 w=75 h=75 -->
+   <transition event="q-event:node_selected" target="NODE_SELECTED"></transition>
+  </state>
+  <state id="NODE_SELECTED"><!--   node-size-and-position x=270 y=270 w=90 h=75  --></state>
  </state>
-<!-- node-size-and-position x=90,11 y=250 w=75 h=75 -->
- <final id="FINAL"><!--   node-size-and-position x=114,5 y=481 w=75 h=75  --></final>
+<!-- node-size-and-position x=86,61 y=293 w=90 h=75   node-size-and-position x=86,61 y=293 w=90 h=75   node-size-and-position x=86,61 y=293 w=90 h=75   node-size-and-position x=94,11 y=168 w=75 h=75   node-size-and-position x=94,11 y=168 w=75 h=75   node-size-and-position x=90,11 y=250 w=75 h=75 -->
+ <final id="FINAL"><!--   node-size-and-position x=380 y=610 w=75 h=75  --></final>
 </scxml>
