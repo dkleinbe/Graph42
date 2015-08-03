@@ -271,7 +271,7 @@ class ScxmlLoader:
                         curState = newState
                         curExecContext.state = newState
 
-                        if (debug):
+                        if debug:
 
                             # Add entry and exit log
 
@@ -315,6 +315,18 @@ class ScxmlLoader:
                             if gp.childMode() == QState.ParallelStates:
                                 self.statesWithFinal.add()
                         self.stateByID[stateId] = f
+
+                        if debug:
+
+                            # Add entry and exit log
+
+                            curExecContext.script = 'logger.debug("[scxml] [debug] > Entering final state: [' + stateId + ']")'
+                            curExecContext.type = ScExecContext.StateEntry
+                            curExecContext.applyScript()
+                            curExecContext.script = 'logger.debug("[scxml] [debug] < Exiting final state: [' + stateId + ']")'
+                            curExecContext.type = ScExecContext.StateExit
+                            curExecContext.applyScript()
+
                 #
                 # <script>
                 #
