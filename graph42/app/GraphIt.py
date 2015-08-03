@@ -60,16 +60,15 @@ class MainWindow(QMainWindow):
                                                     }
                                     )
 
-        #create QTextEdit html handler
+        # create QTextEdit html handler
         logHtmlHandler = TextEditHtmlHandler(self.ui.textEditLog)
         # add formatter to the handlers
         logHtmlHandler.setFormatter(formatter)
         # add handler to top level logger
-        #logging.getLogger().addHandler(logHtmlHandler)
+        # logging.getLogger().addHandler(logHtmlHandler)
         logger.addHandler(logHtmlHandler)
 
-
-        if (0):
+        if 0:
             logger.debug('Debug message')
             logger.info('Log window init <strong>done</strong>')
             logger.warning('Warning message')
@@ -112,6 +111,10 @@ class MainWindow(QMainWindow):
         self.state_machine.registerObject(self, "g42")
         self.state_machine.load("../ui/Resources/Graph42.scxml")
         self.state_machine.start()
+        # Connect final state to exit app
+        self.state_machine.finished.connect(QApplication.instance().quit)
+
+        logger.info("state machine started")
 
     def node_selected(self, evt):
 
