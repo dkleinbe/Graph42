@@ -16,6 +16,7 @@ except ImportError:
 logger = logging.getLogger("Graph42")  # __main__
 logger.addHandler(logging.NullHandler())
 
+
 class Js2PyBridge(QWidget):
     """ A class to bridge Javascript world and PyQt world
     """
@@ -43,19 +44,17 @@ class Js2PyBridge(QWidget):
 
         self.__events[ev_type](evt)
 
-        #msgBox = QMessageBox()
-        #msgBox.setText(str(evt['type']) + ": " + str(int(evt['node_id'])))
-        #ret = msgBox.exec()
-
     @pyqtSlot(int)
     def node_selected(self, d3_id):
         """
         :param d3_id: node id in d3.js world
         :return:
         """
-        msgBox = QMessageBox()
-        msgBox.setText(str(d3_id))
-        ret = msgBox.exec();
+        # TODO: delete this deprecated method
+        if 0:
+            msgBox = QMessageBox()
+            msgBox.setText(str(d3_id))
+            ret = msgBox.exec()
 
     def register_event_handler(self, type, handler):
 
@@ -122,9 +121,9 @@ class D3Graph:
             self.__labels[label] = len(self.__labels)
 
         js = "nodes.push({index: " + str(node.id()) + ", " +\
-                        "name: \"" + str(node.id()) + "\", " +\
-                        "group: " + str(self.__labels[label]) + \
-                            " });"
+                         "name: \"" + str(node.id()) + "\", " +\
+                         "group: " + str(self.__labels[label]) + \
+                         " });"
 
         d3_node_id = self.frame.evaluateJavaScript(js) - 1
         self.__nodes[node.id()] = str(d3_node_id)

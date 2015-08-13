@@ -8,6 +8,7 @@ except ImportError:
     from PyQt4.QtCore import QPoint, QRect, QSize, Qt
     from PyQt4.QtGui import QWidget, QLayout, QApplication, QPushButton, QSizePolicy
 
+
 class Window(QWidget):
     def __init__(self):
         super(Window, self).__init__()

@@ -5,7 +5,7 @@ import sys
 
 from py2neo import neo4j, Node
 
-logger = logging.getLogger("Graph42") # __main__
+logger = logging.getLogger("Graph42")  # __main__
 logger.addHandler(logging.NullHandler())
 
 
@@ -20,12 +20,11 @@ class GraphDatabase:
         self.graph_db = neo4j.Graph(db)
         try:
             ver = self.graph_db.neo4j_version
-        except :
+        except:
             logger.error("Neo4j connection to %s - Unexpected error: %s", db, sys.exc_info()[1].__class__.__name__)
             raise
         else:
             logger.info('neo4j version: %s', ver)
-
 
     def node_labels_set(self):
         """
@@ -113,6 +112,7 @@ class GraphNode:
         for rel in self.node.match_outgoing():
             i_rel = GraphRelation(rel)
             yield i_rel
+
 
 class GraphRelation:
 

@@ -17,14 +17,15 @@ class StreamRedirector(QObject):
     def __init__(self, stream=None):
         QObject.__init__(self)
 
-
     def flush(self):
         self.messageWritten.emit('<br>')
+
     def fileno(self):
         return -1
+
     def write(self, msg):
         #self._textEdit.insertPlainText(msg)
-        if ( not self.signalsBlocked() ):
+        if not self.signalsBlocked():
             self.messageWritten.emit(msg)
 
 
@@ -68,6 +69,7 @@ class TextEditHtmlHandler(Handler):
 
             text_edit.insertHtml(msg)
             text_edit.insertHtml(self.terminator)
+            text_edit.ensureCursorVisible()  # Auto scroll TODO: set this as an option
             # force application to process event to display text synchronously
             QCoreApplication.processEvents()
         except Exception:

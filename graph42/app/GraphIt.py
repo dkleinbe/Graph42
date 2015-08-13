@@ -5,11 +5,11 @@ import sys
 
 #from PyQt5.QtCore import *
 try:
-    from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton
+    from PyQt5.QtWidgets import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton, QWidget, QTreeWidgetItem
     from PyQt5.QtCore import QFile, QObject, pyqtSignal, QUrl, QResource, QTextStream
 
 except ImportError:
-    from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton
+    from PyQt4.QtGui import QApplication, QLabel, QMainWindow, QMessageBox, QPushButton, QWidget, QTreeWidgetItem
     from PyQt4.QtCore import QFile, QObject, QResource, QTextStream
 
 from graph42.tools.log.logstream import TextEditHtmlHandler
@@ -25,7 +25,7 @@ from graph42.ui.ui_GraphItApp import Ui_MainWindowUi
 from graph42.app.GraphDatabase import GraphDatabase,GraphNode, GraphRelation
 
 
-logger = logging.getLogger("Graph42") # __name__
+logger = logging.getLogger("Graph42")  # __name__
 
 
 class MainWindow(QMainWindow):
@@ -33,6 +33,7 @@ class MainWindow(QMainWindow):
         super(MainWindow, self).__init__()
 
         self.ui = Ui_MainWindowUi()
+
         self.ui.setupUi(self)
 
         self.relTypesFlowLayout = FlowLayout(self.ui.groupRelTypes)
@@ -43,7 +44,6 @@ class MainWindow(QMainWindow):
         # create connections
 #        self.ui.exitAction.triggered.connect(QApplication.instance().quit)
 #        self.ui.aboutQtAction.triggered.connect(QApplication.instance().aboutQt)
-
 
         # create formatter
         formatter = HtmlColoredFormatter(
@@ -119,6 +119,29 @@ class MainWindow(QMainWindow):
     def node_selected(self, evt):
 
         logger.info("node selected: [%s]", evt['node_id'])
+        node_id = evt['node_id']
+        node = self.graphDB.node(node_id)
+        props = node.properties()
+
+        self.ui.treeWidget.clear()
+        # Node ID
+        item = QTreeWidgetItem(self.ui.treeWidget)
+        item.setText(0, "Node ID")
+        item.setText(1, str(node_id))
+        # Node label
+        for label in node.labels():
+            item = QTreeWidgetItem(self.ui.treeWidget)
+            item.setText(0, "Label")
+            item.setText(1, str(label))
+
+        for prop_name, prop_value in props.items():
+
+            logger.info("node property: %s: %s", prop_name, prop_value)
+
+            item = QTreeWidgetItem(self.ui.treeWidget)
+            item.setText(0, prop_name)
+            item.setText(1, str(prop_value))
+            self.ui.treeWidget.addTopLevelItem(item)
 
     def Neo4jConnect(self):
 
@@ -144,7 +167,7 @@ class MainWindow(QMainWindow):
         for rel in self.graphDB.relationship_types():
             self.relTypesFlowLayout.addWidget(QPushButton(rel))
 
-        if 0:
+        if 1:
             node = self.graphDB.node(1)
             logger.info("node: %s", node)
             logger.info("node degree: %s", node.degree())
