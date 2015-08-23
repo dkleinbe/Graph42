@@ -45,7 +45,7 @@ class GraphDatabase:
         :param node_id: node's Id
         :return: GraphNode
         """
-        rel_types = self.graph_db.relationship_types
+
         node = self.graph_db.node(node_id)
 
         return GraphNode(node)

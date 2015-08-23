@@ -22,7 +22,8 @@ from graph42.graphics.D3Graph import D3Graph, Js2PyBridge
 
 from graph42.ui.ui_GraphItApp import Ui_MainWindowUi
 
-from graph42.app.GraphDatabase import GraphDatabase,GraphNode, GraphRelation
+from graph42.app.NoSqlQueryModel import NoSqlQueryModel
+from graph42.app.GraphDatabase import GraphDatabase, GraphNode, GraphRelation
 
 
 logger = logging.getLogger("Graph42")  # __name__
@@ -209,9 +210,18 @@ class MainWindow(QMainWindow):
 
         d3graph.restart()
 
+        query = NoSqlQueryModel()
+
+        query.setCypher("MATCH (a)-[r]-(b) RETURN a,r,b LIMIT 20", self.graphDB)
+        logger.info("model row %d, model column %d", query.rowCount(), query.columnCount())
+
+        self.ui.tableView.setModel(query)
+        self.ui.tableView.show()
         logger.info("TestGraph end")
 
 if __name__ == '__main__':
+
+    toto = 1
     logging.basicConfig(level=logging.DEBUG,
                         format='{asctime:<20}|{levelname:.<8}|{name:}|{filename}:{lineno}| {message}',
                         style='{')
